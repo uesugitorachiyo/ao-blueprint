@@ -1,0 +1,14 @@
+{
+  "schema": "ao.blueprint.sufficiency-audit.v0.1",
+  "project_id": "missing-approval",
+  "status": "blocked",
+  "score": 90,
+  "approved_by_user": false,
+  "blocking_assumptions": ["User has not approved the blueprint."],
+  "production_readiness_exit_condition": "",
+  "next_allowed_action": "blocked",
+  "categories": [
+    {"id": "objective", "points": 10, "status": "passed"},
+    {"id": "scope", "points": 10, "status": "passed"}
+  ]
+}

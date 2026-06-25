@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"AO Blueprint Session","type":"object","required":["schema","session_id","idea","status"],"properties":{"schema":{"const":"ao.blueprint.session.v0.1"},"session_id":{"type":"string"},"idea":{"type":"string"},"status":{"type":"string"}}}

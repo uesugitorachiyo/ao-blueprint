@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"AO Blueprint Traceability Matrix","type":"object","required":["schema","project_id","rows"],"properties":{"schema":{"const":"ao.blueprint.traceability-matrix.v0.1"},"project_id":{"type":"string"},"rows":{"type":"array"}}}

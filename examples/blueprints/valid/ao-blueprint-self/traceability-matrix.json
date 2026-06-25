@@ -1,0 +1,21 @@
+{
+  "schema": "ao.blueprint.traceability-matrix.v0.1",
+  "project_id": "ao-blueprint-self",
+  "rows": [
+    {
+      "requirement_id": "REQ-001",
+      "slice_ids": ["SLICE-004"],
+      "evidence": ["internal/cli/cli_test.go::TestInterviewCommandsAdvanceSession"]
+    },
+    {
+      "requirement_id": "REQ-002",
+      "slice_ids": ["SLICE-002"],
+      "evidence": ["internal/blueprint/blueprint_test.go::TestValidPackAuditsToReadyScore100"]
+    },
+    {
+      "requirement_id": "REQ-003",
+      "slice_ids": ["SLICE-003"],
+      "evidence": ["internal/cli/cli_test.go::TestAuthorizeCommandBlocksInvalidPack"]
+    }
+  ]
+}

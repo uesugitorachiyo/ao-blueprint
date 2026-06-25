@@ -1,0 +1,8 @@
+{
+  "schema": "ao.foundry.task.v0.1",
+  "task_id": "ao-blueprint-self-build",
+  "source": "ao-blueprint",
+  "authorization_required": true,
+  "next_action": "delegate-to-ao-forge",
+  "exit_condition": "AO Blueprint production-readiness 100/100"
+}

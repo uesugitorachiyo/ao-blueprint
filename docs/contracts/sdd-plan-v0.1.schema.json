@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"AO Blueprint SDD Plan","type":"object","required":["schema","project_id","slices","stop_condition"],"properties":{"schema":{"const":"ao2.sdd-plan.v1"},"project_id":{"type":"string"},"slices":{"type":"array"},"stop_condition":{"type":"string"}}}

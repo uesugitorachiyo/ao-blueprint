@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"AO Blueprint Answer","type":"object","required":["schema","question_id","answer"],"properties":{"schema":{"const":"ao.blueprint.answer.v0.1"},"question_id":{"type":"string"},"answer":{"type":"string"}}}

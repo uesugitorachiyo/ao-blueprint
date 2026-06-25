@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"AO Blueprint Decision","type":"object","required":["schema","project_id","decisions"],"properties":{"schema":{"const":"ao.blueprint.decision.v0.1"},"project_id":{"type":"string"},"decisions":{"type":"array"}}}

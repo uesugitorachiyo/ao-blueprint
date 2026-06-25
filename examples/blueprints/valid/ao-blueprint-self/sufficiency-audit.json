@@ -1,0 +1,22 @@
+{
+  "schema": "ao.blueprint.sufficiency-audit.v0.1",
+  "project_id": "ao-blueprint-self",
+  "status": "ready",
+  "score": 100,
+  "approved_by_user": true,
+  "blocking_assumptions": [],
+  "production_readiness_exit_condition": "./scripts/production-readiness.sh passes and readiness audit reports score=100 status=ready.",
+  "next_allowed_action": "ao-foundry",
+  "categories": [
+    {"id": "objective", "points": 10, "status": "passed"},
+    {"id": "scope", "points": 10, "status": "passed"},
+    {"id": "domain_workflows", "points": 12, "status": "passed"},
+    {"id": "interfaces_contracts", "points": 10, "status": "passed"},
+    {"id": "data_integrations", "points": 8, "status": "passed"},
+    {"id": "security_privacy", "points": 10, "status": "passed"},
+    {"id": "tests_evaluation", "points": 12, "status": "passed"},
+    {"id": "operations_release", "points": 8, "status": "passed"},
+    {"id": "traceability", "points": 10, "status": "passed"},
+    {"id": "approval_handoff", "points": 10, "status": "passed"}
+  ]
+}

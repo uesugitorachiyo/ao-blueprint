@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"AO Blueprint Pack","type":"object","required":["schema","project_id","artifacts"],"properties":{"schema":{"const":"ao.blueprint.pack.v0.1"},"project_id":{"type":"string"},"artifacts":{"type":"array"}}}

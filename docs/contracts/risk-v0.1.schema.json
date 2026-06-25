@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","title":"AO Blueprint Risk","type":"object","required":["schema","project_id","risks"],"properties":{"schema":{"const":"ao.blueprint.risk.v0.1"},"project_id":{"type":"string"},"risks":{"type":"array"}}}

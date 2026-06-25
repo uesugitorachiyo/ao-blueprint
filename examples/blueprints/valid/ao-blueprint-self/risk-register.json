@@ -1,0 +1,13 @@
+{
+  "schema": "ao.blueprint.risk.v0.1",
+  "project_id": "ao-blueprint-self",
+  "risks": [
+    {
+      "id": "RISK-001",
+      "title": "Vague user intent",
+      "severity": "high",
+      "mitigation": "Adaptive interview and hard authorization blocker.",
+      "status": "mitigated"
+    }
+  ]
+}

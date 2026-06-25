@@ -1,0 +1,29 @@
+{
+  "schema": "ao2.sdd-plan.v1",
+  "project_id": "ao-blueprint-self",
+  "title": "AO Blueprint v0.1",
+  "objective": "Build a requirements interview and build authorization gate for the AO stack.",
+  "slices": [
+    {
+      "id": "SLICE-001",
+      "title": "Contract spine",
+      "acceptance": ["schemas parse", "fixtures validate"]
+    },
+    {
+      "id": "SLICE-002",
+      "title": "Readiness and safety",
+      "acceptance": ["valid fixture scores 100", "unsafe artifact is blocked"]
+    },
+    {
+      "id": "SLICE-003",
+      "title": "Authorization and SDD handoff",
+      "acceptance": ["ready authorization writes digests", "blocked authorization exits non-zero"]
+    },
+    {
+      "id": "SLICE-004",
+      "title": "Interview state",
+      "acceptance": ["session start", "next question", "answer", "status"]
+    }
+  ],
+  "stop_condition": "production-readiness gate passes with score=100 status=ready"
+}

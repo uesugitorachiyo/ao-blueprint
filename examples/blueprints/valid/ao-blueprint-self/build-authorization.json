@@ -1,0 +1,9 @@
+{
+  "schema": "ao.blueprint.build-authorization.v0.1",
+  "project_id": "ao-blueprint-self",
+  "status": "ready",
+  "score": 100,
+  "approved_by_user": true,
+  "blocking_assumptions": [],
+  "next_allowed_action": "ao-foundry"
+}

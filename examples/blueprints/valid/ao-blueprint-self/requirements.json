@@ -1,0 +1,27 @@
+{
+  "schema": "ao.blueprint.requirement.v0.1",
+  "project_id": "ao-blueprint-self",
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "Interview before build",
+      "category": "objective",
+      "description": "AO Blueprint must collect enough user intent before downstream AO work starts.",
+      "acceptance": "A session can start, ask the next question, record answers, and report status."
+    },
+    {
+      "id": "REQ-002",
+      "title": "Readiness gate",
+      "category": "readiness",
+      "description": "AO Blueprint must compute deterministic 100 point readiness.",
+      "acceptance": "The valid fixture audits to score 100 and status ready."
+    },
+    {
+      "id": "REQ-003",
+      "title": "Authorization gate",
+      "category": "authorization",
+      "description": "AO Blueprint must block downstream builds without approval, score 100, and clean safety results.",
+      "acceptance": "The invalid fixture exits non-zero and writes blocked authorization."
+    }
+  ]
+}
