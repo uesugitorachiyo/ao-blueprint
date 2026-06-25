@@ -62,6 +62,7 @@ try {
     throw "draft pack did not remain blocked before approval"
   }
 
+  $global:LASTEXITCODE = 0
   Write-Output "AO Blueprint production readiness: 100/100 status=ready"
 } finally {
   Pop-Location
