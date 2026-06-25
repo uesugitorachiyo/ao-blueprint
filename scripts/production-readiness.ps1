@@ -25,24 +25,16 @@ try {
   go run ./cmd/blueprint compile --session (Join-Path $Out "session.json") --out-dir (Join-Path $Out "draft-pack")
 
   $blockedOut = Join-Path $Out "blocked-authorization.json"
-  $blockedSucceeded = $true
-  try {
-    go run ./cmd/blueprint authorize --pack $InvalidPack --out $blockedOut
-  } catch {
-    $blockedSucceeded = $false
-  }
-  if ($blockedSucceeded) {
+  go run ./cmd/blueprint authorize --pack $InvalidPack --out $blockedOut
+  $blockedExit = $LASTEXITCODE
+  if ($blockedExit -eq 0) {
     throw "invalid fixture unexpectedly authorized"
   }
 
   $draftOut = Join-Path $Out "draft-authorization.json"
-  $draftSucceeded = $true
-  try {
-    go run ./cmd/blueprint authorize --pack (Join-Path $Out "draft-pack") --out $draftOut
-  } catch {
-    $draftSucceeded = $false
-  }
-  if ($draftSucceeded) {
+  go run ./cmd/blueprint authorize --pack (Join-Path $Out "draft-pack") --out $draftOut
+  $draftExit = $LASTEXITCODE
+  if ($draftExit -eq 0) {
     throw "draft pack unexpectedly authorized without approval"
   }
 
