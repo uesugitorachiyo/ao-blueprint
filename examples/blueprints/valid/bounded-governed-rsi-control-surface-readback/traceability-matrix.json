@@ -1,0 +1,21 @@
+{
+  "schema": "ao.blueprint.traceability-matrix.v0.1",
+  "project_id": "bounded-governed-rsi-control-surface-readback",
+  "rows": [
+    {
+      "requirement": "REQ-1",
+      "artifact": "ao-foundry-task.json",
+      "evidence": ["internal/blueprint/blueprint_test.go::TestBoundedRSIControlSurfaceReadbackPackAuthorizesToFoundry"]
+    },
+    {
+      "requirement": "REQ-2",
+      "artifact": "implementation-spec.md",
+      "evidence": ["full_autonomous_self_mutating_rsi denied markers"]
+    },
+    {
+      "requirement": "REQ-3",
+      "artifact": "ao-forge-handoff.md",
+      "evidence": ["ao2.cp-ao-stack-rsi-chain-binding-readback.v1"]
+    }
+  ]
+}

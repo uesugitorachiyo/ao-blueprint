@@ -42,6 +42,7 @@ go run ./cmd/blueprint readiness audit --pack examples/blueprints/valid/ao-bluep
 go run ./cmd/blueprint sdd emit --pack examples/blueprints/valid/ao-blueprint-self --out tmp/sdd-plan.json
 go run ./cmd/blueprint authorize --pack examples/blueprints/valid/ao-blueprint-self --out tmp/build-authorization.json
 go run ./cmd/blueprint pack inspect --pack examples/blueprints/valid/ao-blueprint-self --json
+go run ./cmd/blueprint authorize --pack examples/blueprints/valid/bounded-governed-rsi-control-surface-readback --out tmp/bounded-rsi-build-authorization.json
 ```
 
 ## Production-Readiness Gate

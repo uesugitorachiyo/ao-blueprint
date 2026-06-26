@@ -1,0 +1,21 @@
+{
+  "schema": "ao.blueprint.requirement.v0.1",
+  "project_id": "bounded-governed-rsi-control-surface-readback",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "category": "authorization",
+      "description": "Authorize only the bounded governed RSI control-surface readback loop."
+    },
+    {
+      "id": "REQ-2",
+      "category": "claim-boundary",
+      "description": "Preserve full autonomous self-mutating RSI as denied by design."
+    },
+    {
+      "id": "REQ-3",
+      "category": "evidence",
+      "description": "Require durable evidence linking Blueprint, Foundry, Forge, Covenant, AO2, and control-plane readback."
+    }
+  ]
+}
