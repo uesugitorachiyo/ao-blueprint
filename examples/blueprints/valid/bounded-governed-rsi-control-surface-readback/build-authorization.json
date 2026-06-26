@@ -1,0 +1,17 @@
+{
+  "schema": "ao.blueprint.build-authorization.v0.1",
+  "project_id": "bounded-governed-rsi-control-surface-readback",
+  "status": "ready",
+  "score": 100,
+  "approved_by_user": true,
+  "blocking_assumptions": [],
+  "blueprint_pack_digest": "sha256:eb75e2584b5048fca77bc574a22fd0df77ea2e2443141431015c243b3217159d",
+  "requirements_digest": "sha256:47811ddca3282eeee65fa91c5c6852eaa1ed336f30fe5f190f3ce71c7f72f1d1",
+  "traceability_digest": "sha256:44055199c0a72ba2d4aa456a90023943afb01771dd3e57cfff49d042b7de4c17",
+  "sdd_plan_digest": "sha256:b05eac3f9cc48158ccada57947a48373f5aed0f37c35c4a9eb8c8578003c5437",
+  "sdd_plan_path": "sdd-plan.json",
+  "ao_forge_handoff_path": "ao-forge-handoff.md",
+  "ao_foundry_task_path": "ao-foundry-task.json",
+  "production_readiness_exit_condition": "Downstream evidence proves bounded_governed_rsi control-surface readback is linked across Blueprint, Foundry, Forge, Covenant, AO2, and control-plane while full_autonomous_self_mutating_rsi remains denied.",
+  "next_allowed_action": "ao-foundry"
+}

@@ -35,6 +35,36 @@ func TestValidPackAuditsToReadyScore100(t *testing.T) {
 	}
 }
 
+func TestBoundedRSIControlSurfaceReadbackPackAuthorizesToFoundry(t *testing.T) {
+	pack := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "bounded-governed-rsi-control-surface-readback")
+
+	audit, err := AuditPack(pack)
+	if err != nil {
+		t.Fatalf("AuditPack returned error: %v", err)
+	}
+	if audit.ProjectID != "bounded-governed-rsi-control-surface-readback" {
+		t.Fatalf("project_id = %q, want bounded-governed-rsi-control-surface-readback", audit.ProjectID)
+	}
+	if audit.Status != "ready" || audit.Score != 100 {
+		t.Fatalf("audit status=%q score=%d blockers=%v, want ready score=100", audit.Status, audit.Score, audit.Blockers)
+	}
+
+	auth, err := AuthorizePack(pack)
+	if err != nil {
+		t.Fatalf("AuthorizePack returned error: %v", err)
+	}
+	if auth.Status != "ready" ||
+		auth.Score != 100 ||
+		!auth.ApprovedByUser ||
+		auth.NextAllowedAction != "ao-foundry" ||
+		auth.ProjectID != "bounded-governed-rsi-control-surface-readback" {
+		t.Fatalf("authorization drifted: %+v", auth)
+	}
+	if strings.Contains(strings.Join(auth.BlockingAssumptions, " "), "self-authorized") {
+		t.Fatalf("authorization must not allow Blueprint self-authorization: %+v", auth)
+	}
+}
+
 func TestMissingImplementationSpecBlocksReadiness(t *testing.T) {
 	source := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
 	pack := filepath.Join(t.TempDir(), "pack")

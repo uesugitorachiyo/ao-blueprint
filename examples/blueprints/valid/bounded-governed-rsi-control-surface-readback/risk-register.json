@@ -1,0 +1,16 @@
+{
+  "schema": "ao.blueprint.risk.v0.1",
+  "project_id": "bounded-governed-rsi-control-surface-readback",
+  "risks": [
+    {
+      "id": "RISK-1",
+      "description": "Operators may misread improvement percentage as full autonomous RSI authority.",
+      "mitigation": "Require explicit denied full-autonomous claim markers in downstream evidence."
+    },
+    {
+      "id": "RISK-2",
+      "description": "Readback surfaces may drift into approval semantics.",
+      "mitigation": "Require observer-only trust boundary markers."
+    }
+  ]
+}

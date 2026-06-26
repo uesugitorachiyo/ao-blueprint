@@ -1,0 +1,8 @@
+{
+  "schema": "ao.foundry.task.v0.1",
+  "task_id": "bounded-governed-rsi-control-surface-readback",
+  "source": "ao-blueprint",
+  "repo": "ao-forge",
+  "summary": "Package bounded governed RSI control-surface readback evidence for downstream operator clarity.",
+  "exit_condition": "Forge GoalRun evidence retains the AO stack RSI chain-binding readback and keeps full autonomous RSI denied."
+}

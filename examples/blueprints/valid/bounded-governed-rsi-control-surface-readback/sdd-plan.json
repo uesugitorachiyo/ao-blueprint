@@ -1,0 +1,11 @@
+{
+  "schema": "ao2.sdd-plan.v1",
+  "project_id": "bounded-governed-rsi-control-surface-readback",
+  "objective": "Improve bounded governed RSI control-surface readback evidence linkage.",
+  "work_items": [
+    "Retain stack readback evidence in Forge GoalRun packets.",
+    "Package retained evidence for Foundry next-task consumption.",
+    "Keep full autonomous RSI publication denied."
+  ],
+  "stop_condition": "All touched repo checks pass and evidence states full_autonomous_self_mutating_rsi remains denied."
+}
