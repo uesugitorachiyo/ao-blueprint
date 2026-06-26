@@ -35,6 +35,31 @@ func TestValidPackAuditsToReadyScore100(t *testing.T) {
 	}
 }
 
+func TestMissingImplementationSpecBlocksReadiness(t *testing.T) {
+	source := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
+	pack := filepath.Join(t.TempDir(), "pack")
+	if err := copyDirForTest(source, pack); err != nil {
+		t.Fatalf("copy valid pack: %v", err)
+	}
+	if err := os.Remove(filepath.Join(pack, "implementation-spec.md")); err != nil {
+		t.Fatalf("remove implementation spec: %v", err)
+	}
+
+	audit, err := AuditPack(pack)
+	if err != nil {
+		t.Fatalf("AuditPack returned unexpected error: %v", err)
+	}
+	if audit.Status != "blocked" {
+		t.Fatalf("status = %q, want blocked", audit.Status)
+	}
+	if audit.Score >= 100 {
+		t.Fatalf("score = %d, want below 100", audit.Score)
+	}
+	if !diagnosticsContainPath(audit.Blockers, "implementation-spec.md") {
+		t.Fatalf("blockers = %#v, want implementation-spec.md blocker", audit.Blockers)
+	}
+}
+
 func TestMissingApprovalPackBlocksAuthorization(t *testing.T) {
 	pack := filepath.Join(repoRoot(t), "examples", "blueprints", "invalid", "missing-approval")
 
@@ -99,4 +124,34 @@ func TestInspectPackReportsRequiredArtifacts(t *testing.T) {
 	if inspection.Status != "ready" {
 		t.Fatalf("status = %q, want ready", inspection.Status)
 	}
+}
+
+func diagnosticsContainPath(items []Diagnostic, want string) bool {
+	for _, item := range items {
+		if strings.Contains(item.Path, want) {
+			return true
+		}
+	}
+	return false
+}
+
+func copyDirForTest(source string, target string) error {
+	return filepath.WalkDir(source, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
+		dst := filepath.Join(target, rel)
+		if entry.IsDir() {
+			return os.MkdirAll(dst, 0o755)
+		}
+		body, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(dst, body, 0o644)
+	})
 }

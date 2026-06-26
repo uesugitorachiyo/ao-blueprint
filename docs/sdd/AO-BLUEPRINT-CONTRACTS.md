@@ -21,6 +21,12 @@ Every contract includes a schema version, stable ID, public-safety class, and
 human-readable validation errors. Pack-level contracts must be validated from a
 repository-relative path and must not depend on local machine state.
 
+Every ready blueprint pack must include `implementation-spec.md`. The
+implementation spec is the pre-SDD build contract and must cover outcome,
+scope, stack, constraints, and verification. Readiness blocks when it is
+missing because downstream AO automation must not infer build detail from a
+vague interview transcript.
+
 ## Build Authorization
 
 Authorization requires:

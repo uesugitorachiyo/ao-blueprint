@@ -203,6 +203,7 @@ func runCompile(args []string, stdout io.Writer) error {
 		"contracts.md":             "# Contracts\n\nDraft pack uses AO Blueprint v0.1 contracts and requires review before build handoff.\n",
 		"security-privacy.md":      "# Security And Privacy\n\nDraft artifacts must be scanned for local paths, tokens, private keys, and secret values before approval.\n",
 		"operations-runbook.md":    "# Operations Runbook\n\nRun blueprint lint, readiness audit, SDD emit, and authorization before downstream AO work.\n",
+		"implementation-spec.md":   buildImplementationSpec(s, answers),
 		"test-evaluation-plan.md":  "# Test And Evaluation Plan\n\nUse fixture tests, readiness audit, authorization denial, public-safety scan, and clean-clone smoke checks.\n",
 		"implementation-slices.md": "# Implementation Slices\n\n1. Review draft requirements.\n2. Resolve blockers.\n3. Approve pack.\n4. Authorize downstream AO work.\n",
 		"ao-forge-handoff.md":      "# AO Forge Handoff\n\nBlocked until AO Blueprint authorization reports status ready.\n",
@@ -290,6 +291,26 @@ func runCompile(args []string, stdout io.Writer) error {
 	}
 	fmt.Fprintf(stdout, "compiled blueprint draft: %s\n", filepath.Clean(outDir))
 	return nil
+}
+
+func buildImplementationSpec(s session, answers string) string {
+	var builder strings.Builder
+	builder.WriteString("# Implementation Spec\n\n")
+	builder.WriteString("## Outcome\n\n")
+	builder.WriteString(s.Idea)
+	builder.WriteString("\n\n")
+	builder.WriteString("The build may start only after AO Blueprint authorization reports ready.\n\n")
+	builder.WriteString("## Scope\n\n")
+	builder.WriteString("In scope: implement only requirements accepted in the reviewed blueprint pack.\n\n")
+	builder.WriteString("Out of scope: downstream AO automation must not add product scope, release mutation, provider calls, credential storage, or private evidence outside the authorized pack.\n\n")
+	builder.WriteString("## Stack\n\n")
+	builder.WriteString("Use the stack declared by the blueprint pack, preserve AO stack boundaries, and route governed execution through AO Foundry, AO Forge, AO Covenant, and AO2 as authorized.\n\n")
+	builder.WriteString("## Constraints\n\n")
+	builder.WriteString("Keep local-first defaults, scan public artifacts for secrets and local paths, preserve repository-relative evidence paths, and stop when authorization is blocked.\n\n")
+	builder.WriteString("## Verification\n\n")
+	builder.WriteString("Run blueprint lint, readiness audit, SDD emit, authorization, and downstream production-readiness gates before claiming completion.\n\n")
+	builder.WriteString(answers)
+	return builder.String()
 }
 
 func summarizeAnswers(s session) string {

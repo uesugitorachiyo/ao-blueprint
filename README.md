@@ -10,6 +10,11 @@ AO Blueprint is intentionally not an implementation runner. It emits a reviewed
 blueprint pack and a machine-readable build authorization packet. Downstream AO
 automation must refuse to start when authorization is blocked.
 
+Every ready blueprint pack must include `implementation-spec.md`, a concrete
+pre-SDD build contract with outcome, scope, stack, constraints, and verification
+sections. This keeps AO Foundry and AO Forge from starting implementation from a
+vague interview transcript alone.
+
 ## Role In The AO Stack
 
 ```text

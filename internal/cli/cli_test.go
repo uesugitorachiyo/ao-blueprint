@@ -117,6 +117,23 @@ func TestCompileCommandWritesBlockedDraftPack(t *testing.T) {
 	if audit["status"] != "blocked" {
 		t.Fatalf("compiled draft status = %#v, want blocked", audit["status"])
 	}
+
+	spec, err := os.ReadFile(filepath.Join(outDir, "implementation-spec.md"))
+	if err != nil {
+		t.Fatalf("compiled draft missing implementation spec: %v", err)
+	}
+	for _, want := range []string{
+		"# Implementation Spec",
+		"## Outcome",
+		"## Scope",
+		"## Stack",
+		"## Constraints",
+		"## Verification",
+	} {
+		if !strings.Contains(string(spec), want) {
+			t.Fatalf("implementation spec missing %q:\n%s", want, spec)
+		}
+	}
 }
 
 func readJSON(t *testing.T, path string, out any) {
