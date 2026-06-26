@@ -204,6 +204,7 @@ func runCompile(args []string, stdout io.Writer) error {
 		"security-privacy.md":      "# Security And Privacy\n\nDraft artifacts must be scanned for local paths, tokens, private keys, and secret values before approval.\n",
 		"operations-runbook.md":    "# Operations Runbook\n\nRun blueprint lint, readiness audit, SDD emit, and authorization before downstream AO work.\n",
 		"implementation-spec.md":   buildImplementationSpec(s, answers),
+		"quality-profile.md":       buildQualityProfile(),
 		"test-evaluation-plan.md":  "# Test And Evaluation Plan\n\nUse fixture tests, readiness audit, authorization denial, public-safety scan, and clean-clone smoke checks.\n",
 		"implementation-slices.md": "# Implementation Slices\n\n1. Review draft requirements.\n2. Resolve blockers.\n3. Approve pack.\n4. Authorize downstream AO work.\n",
 		"ao-forge-handoff.md":      "# AO Forge Handoff\n\nBlocked until AO Blueprint authorization reports status ready.\n",
@@ -311,6 +312,38 @@ func buildImplementationSpec(s session, answers string) string {
 	builder.WriteString("Run blueprint lint, readiness audit, SDD emit, authorization, and downstream production-readiness gates before claiming completion.\n\n")
 	builder.WriteString(answers)
 	return builder.String()
+}
+
+func buildQualityProfile() string {
+	return `# Quality Profile
+
+## Code Quality
+
+Downstream implementation must prefer simple, readable, typed code with clear
+names, bounded functions, repository-local evidence, and no speculative
+abstractions. Framework-specific style belongs in the target repository, but
+the blueprint must declare the quality bar before AO Foundry or AO Forge starts
+building.
+
+## TDD And Evals
+
+Every implementation slice must name its failing-first test or deterministic
+eval before code changes begin. Critical behavior needs regression coverage;
+agentic or open-ended behavior needs a scorecard, fixture, or reviewer gate
+with explicit pass and fail criteria.
+
+## Verification Loop
+
+The authorized build must identify the local build, type or vet, lint, tests,
+schema validation, security scan, and public-readiness commands that prove the
+claim. A task is not complete until fresh verification evidence exists.
+
+## Security Review
+
+Security-sensitive changes must record input validation, secret handling,
+authorization, dependency, logging, and public artifact checks. Findings become
+AO Sentinel or AO Covenant packets instead of private notes.
+`
 }
 
 func summarizeAnswers(s session) string {

@@ -105,7 +105,7 @@ var categorySpecs = []categorySpec{
 	{id: "interfaces_contracts", points: 10, files: []string{"contracts.md", "requirements.json"}},
 	{id: "data_integrations", points: 8, files: []string{"requirements.json"}},
 	{id: "security_privacy", points: 10, files: []string{"security-privacy.md"}},
-	{id: "tests_evaluation", points: 12, files: []string{"implementation-spec.md", "test-evaluation-plan.md", "implementation-slices.md"}},
+	{id: "tests_evaluation", points: 12, files: []string{"implementation-spec.md", "quality-profile.md", "test-evaluation-plan.md", "implementation-slices.md"}},
 	{id: "operations_release", points: 8, files: []string{"operations-runbook.md"}},
 	{id: "traceability", points: 10, files: []string{"traceability-matrix.json"}},
 	{id: "approval_handoff", points: 10, files: []string{"sufficiency-audit.json", "sdd-plan.json", "ao-forge-handoff.md", "ao-foundry-task.json"}},

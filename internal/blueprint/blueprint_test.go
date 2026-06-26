@@ -60,6 +60,31 @@ func TestMissingImplementationSpecBlocksReadiness(t *testing.T) {
 	}
 }
 
+func TestMissingQualityProfileBlocksReadiness(t *testing.T) {
+	source := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
+	pack := filepath.Join(t.TempDir(), "pack")
+	if err := copyDirForTest(source, pack); err != nil {
+		t.Fatalf("copy valid pack: %v", err)
+	}
+	if err := os.Remove(filepath.Join(pack, "quality-profile.md")); err != nil {
+		t.Fatalf("remove quality profile: %v", err)
+	}
+
+	audit, err := AuditPack(pack)
+	if err != nil {
+		t.Fatalf("AuditPack returned unexpected error: %v", err)
+	}
+	if audit.Status != "blocked" {
+		t.Fatalf("status = %q, want blocked", audit.Status)
+	}
+	if audit.Score >= 100 {
+		t.Fatalf("score = %d, want below 100", audit.Score)
+	}
+	if !diagnosticsContainPath(audit.Blockers, "quality-profile.md") {
+		t.Fatalf("blockers = %#v, want quality-profile.md blocker", audit.Blockers)
+	}
+}
+
 func TestMissingApprovalPackBlocksAuthorization(t *testing.T) {
 	pack := filepath.Join(repoRoot(t), "examples", "blueprints", "invalid", "missing-approval")
 

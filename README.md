@@ -12,8 +12,10 @@ automation must refuse to start when authorization is blocked.
 
 Every ready blueprint pack must include `implementation-spec.md`, a concrete
 pre-SDD build contract with outcome, scope, stack, constraints, and verification
-sections. This keeps AO Foundry and AO Forge from starting implementation from a
-vague interview transcript alone.
+sections. It must also include `quality-profile.md`, which records the
+AO-tailored code quality, TDD/eval, verification-loop, and security-review bar
+for downstream implementation. This keeps AO Foundry and AO Forge from starting
+implementation from a vague interview transcript alone.
 
 ## Role In The AO Stack
 

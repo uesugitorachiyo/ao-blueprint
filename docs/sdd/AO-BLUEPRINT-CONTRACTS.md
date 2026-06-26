@@ -27,6 +27,11 @@ scope, stack, constraints, and verification. Readiness blocks when it is
 missing because downstream AO automation must not infer build detail from a
 vague interview transcript.
 
+Every ready blueprint pack must also include `quality-profile.md`. The quality
+profile adapts Claude Code-style code-quality, TDD, eval, verification-loop,
+and security-review patterns into AO-owned gates without copying prompt or
+tooling-specific instructions into the public artifact.
+
 ## Build Authorization
 
 Authorization requires:

@@ -25,6 +25,7 @@ Any of these blocks authorization regardless of score:
 - unsafe public artifact finding;
 - invalid JSON artifact;
 - missing SDD plan;
+- missing implementation spec or quality profile;
 - missing traceability matrix;
 - missing production-readiness exit condition;
 - next action outside AO Foundry or AO Forge.

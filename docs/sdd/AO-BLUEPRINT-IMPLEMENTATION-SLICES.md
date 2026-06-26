@@ -17,6 +17,8 @@ implementation and later passes.
 - JSON lint for durable examples and schemas.
 - Blueprint pack inspection.
 - Sufficiency audit with 100-point scoring and hard blockers.
+- Required implementation spec and quality profile artifacts for downstream
+  AO build readiness.
 
 Acceptance gate: valid fixture scores 100/100; invalid fixture is blocked.
 

@@ -134,6 +134,22 @@ func TestCompileCommandWritesBlockedDraftPack(t *testing.T) {
 			t.Fatalf("implementation spec missing %q:\n%s", want, spec)
 		}
 	}
+
+	profile, err := os.ReadFile(filepath.Join(outDir, "quality-profile.md"))
+	if err != nil {
+		t.Fatalf("compiled draft missing quality profile: %v", err)
+	}
+	for _, want := range []string{
+		"# Quality Profile",
+		"## Code Quality",
+		"## TDD And Evals",
+		"## Verification Loop",
+		"## Security Review",
+	} {
+		if !strings.Contains(string(profile), want) {
+			t.Fatalf("quality profile missing %q:\n%s", want, profile)
+		}
+	}
 }
 
 func readJSON(t *testing.T, path string, out any) {
