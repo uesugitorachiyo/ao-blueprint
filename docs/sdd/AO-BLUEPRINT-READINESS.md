@@ -29,3 +29,10 @@ Any of these blocks authorization regardless of score:
 - missing traceability matrix;
 - missing production-readiness exit condition;
 - next action outside AO Foundry or AO Forge.
+
+Build authorization must also remain scoped to requirement readiness. It must
+not be interpreted as approval for live repository mutation, provider calls,
+branch creation, patch application, release, publication, or fully
+unsupervised complex mutation. A docs-only live mutation candidate still needs
+the downstream exact-scope approval and gate chain before any PR rehearsal can
+execute.
