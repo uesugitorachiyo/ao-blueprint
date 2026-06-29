@@ -5,7 +5,8 @@
 AO Blueprint owns interview state, blueprint compilation, sufficiency scoring,
 SDD plan emission, public-safety scanning, and build authorization. It does not
 own implementation execution, policy authority, benchmark scoring, adversarial
-hardening, monitoring, or promotion.
+hardening, monitoring, promotion, branch creation, patch application, provider
+calls, publishing, releases, or live repository mutation approval.
 
 ## Packages
 
@@ -22,6 +23,13 @@ idea -> interview session -> answers -> blueprint pack
 -> lint -> readiness audit -> user approval
 -> SDD plan -> build authorization -> downstream AO handoff
 ```
+
+For docs-only live mutation preparation, AO Blueprint may mark the requirement
+as build-ready or blocked for clarification. That build authorization only lets
+the downstream stack consider the work; exact live mutation permission remains
+with the later Covenant ticket, Foundry approval gate, Forge guard, AO2 patch
+packet, Sentinel/Promoter boundaries, rollback rehearsal, Command readback, and
+operator approval.
 
 ## Failure Model
 

@@ -43,3 +43,8 @@ Authorization requires:
 - matching digests for requirements, traceability, and SDD plan;
 - production-readiness exit condition present;
 - next allowed action targets AO Foundry or AO Forge.
+
+The authorization contract is a build-readiness contract only. It can point a
+ready or docs-only requirement toward Foundry or Forge, but it must not claim
+patch approval, live execution permission, provider authority, release
+authority, or broad live mutation authority.

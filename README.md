@@ -10,6 +10,14 @@ AO Blueprint is intentionally not an implementation runner. It emits a reviewed
 blueprint pack and a machine-readable build authorization packet. Downstream AO
 automation must refuse to start when authorization is blocked.
 
+Build authorization is not live mutation approval. AO Blueprint can classify
+underspecified work, docs-only work, and build-ready work, but a first tiny
+docs-only live repository mutation still requires the later exact-scope
+Covenant, Foundry, Forge, AO2, Sentinel, Promoter, rollback, Command, and
+operator approval chain. Blueprint does not approve patches, create branches,
+execute work, call providers, publish, release, or grant broad live mutation
+authority.
+
 Every ready blueprint pack must include `implementation-spec.md`, a concrete
 pre-SDD build contract with outcome, scope, stack, constraints, and verification
 sections. It must also include `quality-profile.md`, which records the
