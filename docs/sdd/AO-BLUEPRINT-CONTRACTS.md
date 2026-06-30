@@ -45,6 +45,11 @@ Authorization requires:
 - next allowed action targets AO Foundry or AO Forge.
 
 The authorization contract is a build-readiness contract only. It can point a
-ready or docs-only requirement toward Foundry or Forge, but it must not claim
-patch approval, live execution permission, provider authority, release
-authority, or broad live mutation authority.
+ready bounded requirement toward downstream AO implementation, but for
+oversized, mutation-class, or long-running work it must be consumed by AO Atlas
+before AO Foundry. Atlas must emit the ready Blueprint import, workgraph,
+context packs, candidate-selection record, and Foundry import material; missing,
+blocked, stale, or out-of-scope authorization remains a blocked Blueprint
+request, not a ready Foundry workgraph. Authorization must not claim patch
+approval, live execution permission, provider authority, release authority, or
+broad live mutation authority.

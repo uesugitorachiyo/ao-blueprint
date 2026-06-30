@@ -28,11 +28,12 @@ Any of these blocks authorization regardless of score:
 - missing implementation spec or quality profile;
 - missing traceability matrix;
 - missing production-readiness exit condition;
-- next action outside AO Foundry or AO Forge.
+- next action outside the authorized AO path, including AO Atlas before AO
+  Foundry for oversized, mutation-class, or long-running work.
 
 Build authorization must also remain scoped to requirement readiness. It must
 not be interpreted as approval for live repository mutation, provider calls,
 branch creation, patch application, release, publication, or fully
-unsupervised complex mutation. A docs-only live mutation candidate still needs
-the downstream exact-scope approval and gate chain before any PR rehearsal can
-execute.
+unsupervised complex mutation. A docs-only or low-risk live mutation candidate
+still needs Atlas import/readback plus the downstream exact-scope approval and
+gate chain before any PR rehearsal can execute.

@@ -10,6 +10,12 @@ AO Blueprint is intentionally not an implementation runner. It emits a reviewed
 blueprint pack and a machine-readable build authorization packet. Downstream AO
 automation must refuse to start when authorization is blocked.
 
+For oversized, mutation-class, and long-running work, the next compiler is AO
+Atlas, not AO Foundry. AO Blueprint emits the pack and authorization packet; AO
+Atlas imports them, digest-binds the implementation spec, quality profile,
+candidate rules, mutation class, and downstream Foundry import material, then
+hands Foundry only the Atlas-compiled import/readback chain.
+
 Build authorization is not live mutation approval. AO Blueprint can classify
 underspecified work, docs-only work, and build-ready work, but a first tiny
 docs-only live repository mutation still requires the later exact-scope
@@ -31,6 +37,7 @@ implementation from a vague interview transcript alone.
 raw idea
 -> AO Blueprint interview and blueprint pack
 -> AO Blueprint build authorization packet
+-> AO Atlas Blueprint import, workgraph, context packs, and Foundry import material
 -> AO Foundry portfolio scheduling
 -> AO Forge governed factory run
 -> AO Covenant policy and side-effect gates
