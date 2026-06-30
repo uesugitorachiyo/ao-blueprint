@@ -154,7 +154,33 @@ func runAuthorize(args []string, stdout io.Writer) error {
 		return err
 	}
 	fmt.Fprintf(stdout, "authorization: %s score=%d next=%s\n", auth.Status, auth.Score, auth.NextAllowedAction)
+	printNextStep(stdout, pack, auth)
 	return nil
+}
+
+func printNextStep(stdout io.Writer, pack string, auth blueprint.BuildAuthorization) {
+	if auth.Status != "ready" {
+		return
+	}
+	switch auth.NextAllowedAction {
+	case "ao-atlas", "ao-atlas-then-foundry":
+		fmt.Fprintln(stdout, "Next step: send the Blueprint pack to AO Atlas first.")
+		printHandoffPrompt(stdout, pack, auth.DownstreamHandoffPromptPath)
+		fmt.Fprintln(stdout, "Foundry waits for Atlas to compile the workgraph and import only the first safe node.")
+	case "ao-foundry":
+		fmt.Fprintln(stdout, "Next step: send the Blueprint pack to AO Foundry.")
+		printHandoffPrompt(stdout, pack, auth.DownstreamHandoffPromptPath)
+	case "ao-forge":
+		fmt.Fprintln(stdout, "Next step: send the Blueprint pack to AO Forge.")
+		printHandoffPrompt(stdout, pack, auth.DownstreamHandoffPromptPath)
+	}
+}
+
+func printHandoffPrompt(stdout io.Writer, pack string, promptPath string) {
+	if promptPath == "" {
+		return
+	}
+	fmt.Fprintf(stdout, "Use handoff prompt: %s\n", filepath.ToSlash(filepath.Join(filepath.Clean(pack), promptPath)))
 }
 
 func runPack(args []string, stdout io.Writer) error {

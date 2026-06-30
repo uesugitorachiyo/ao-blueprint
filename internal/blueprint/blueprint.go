@@ -64,6 +64,7 @@ type BuildAuthorization struct {
 	SDDPlanPath                      string       `json:"sdd_plan_path,omitempty"`
 	AOForgeHandoffPath               string       `json:"ao_forge_handoff_path,omitempty"`
 	AOFoundryTaskPath                string       `json:"ao_foundry_task_path,omitempty"`
+	DownstreamHandoffPromptPath      string       `json:"downstream_handoff_prompt_path,omitempty"`
 	ProductionReadinessExitCondition string       `json:"production_readiness_exit_condition"`
 	NextAllowedAction                string       `json:"next_allowed_action"`
 	Blockers                         []Diagnostic `json:"blockers,omitempty"`
@@ -241,6 +242,9 @@ func AuthorizePack(pack string) (BuildAuthorization, error) {
 		SDDPlanPath:                      "sdd-plan.json",
 		AOForgeHandoffPath:               "ao-forge-handoff.md",
 		AOFoundryTaskPath:                "ao-foundry-task.json",
+	}
+	if _, statErr := os.Stat(filepath.Join(filepath.Clean(pack), "downstream-handoff-prompt.md")); statErr == nil {
+		auth.DownstreamHandoffPromptPath = "downstream-handoff-prompt.md"
 	}
 	if err != nil {
 		return auth, err

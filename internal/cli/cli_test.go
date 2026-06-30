@@ -69,6 +69,42 @@ func TestAuthorizeCommandBlocksInvalidPack(t *testing.T) {
 	}
 }
 
+func TestAuthorizeCommandPrintsAtlasFirstHandoffGuidance(t *testing.T) {
+	source := filepath.Join(rootDir(t), "examples", "blueprints", "valid", "ao-blueprint-self")
+	pack := filepath.Join(t.TempDir(), "atlas-pack")
+	if err := copyDirForCLITest(source, pack); err != nil {
+		t.Fatalf("copy pack: %v", err)
+	}
+	writeJSONForCLITest(t, filepath.Join(pack, "ao-foundry-task.json"), map[string]any{
+		"schema":                 "ao.foundry.task.v0.1",
+		"task_id":                "atlas-required-pack",
+		"source":                 "ao-blueprint",
+		"authorization_required": true,
+		"atlas_required":         true,
+		"summary":                "Compile an Atlas workgraph, context packs, candidate records, and first safe Foundry import.",
+		"exit_condition":         "AO Atlas emits Foundry import material.",
+	})
+	if err := os.WriteFile(filepath.Join(pack, "downstream-handoff-prompt.md"), []byte("# Downstream Handoff Prompt\n"), 0o644); err != nil {
+		t.Fatalf("write handoff prompt: %v", err)
+	}
+	out := filepath.Join(t.TempDir(), "authorization.json")
+
+	stdout, _, err := runCLI("authorize", "--pack", pack, "--out", out)
+	if err != nil {
+		t.Fatalf("authorize returned error: %v", err)
+	}
+	for _, want := range []string{
+		"authorization: ready score=100 next=ao-atlas",
+		"Next step: send the Blueprint pack to AO Atlas first.",
+		"Use handoff prompt:",
+		"Foundry waits for Atlas to compile the workgraph and import only the first safe node.",
+	} {
+		if !strings.Contains(stdout, want) {
+			t.Fatalf("authorize stdout missing %q:\n%s", want, stdout)
+		}
+	}
+}
+
 func TestInterviewCommandsAdvanceSession(t *testing.T) {
 	session := filepath.Join(t.TempDir(), "session.json")
 
@@ -160,5 +196,38 @@ func readJSON(t *testing.T, path string, out any) {
 	}
 	if err := json.Unmarshal(raw, out); err != nil {
 		t.Fatalf("parse %s: %v", path, err)
+	}
+}
+
+func copyDirForCLITest(source string, target string) error {
+	return filepath.WalkDir(source, func(path string, entry os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(source, path)
+		if err != nil {
+			return err
+		}
+		dst := filepath.Join(target, rel)
+		if entry.IsDir() {
+			return os.MkdirAll(dst, 0o755)
+		}
+		body, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(dst, body, 0o644)
+	})
+}
+
+func writeJSONForCLITest(t *testing.T, path string, value any) {
+	t.Helper()
+	body, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		t.Fatalf("marshal %s: %v", path, err)
+	}
+	body = append(body, '\n')
+	if err := os.WriteFile(path, body, 0o644); err != nil {
+		t.Fatalf("write %s: %v", path, err)
 	}
 }
