@@ -20,7 +20,8 @@ blueprints, SDD plans, acceptance gates, and downstream AO handoff artifacts.
 3. Compile a blueprint pack with human-readable and machine-readable artifacts.
 4. Score the pack against a deterministic 100-point sufficiency gate.
 5. Emit an AO2-compatible SDD plan.
-6. Emit an AO Forge or AO Foundry handoff.
+6. Emit downstream handoff artifacts while routing oversized, mutation-class,
+   and long-running work through AO Atlas before AO Foundry.
 7. Emit build authorization only when score is 100/100, user approval exists,
    no blockers remain, and public-safety checks pass.
 

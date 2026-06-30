@@ -24,12 +24,19 @@ idea -> interview session -> answers -> blueprint pack
 -> SDD plan -> build authorization -> downstream AO handoff
 ```
 
+For oversized, mutation-class, and long-running work, the downstream handoff is
+AO Blueprint -> AO Atlas -> AO Foundry. Blueprint emits the pack and build
+authorization; Atlas is the mandatory compiler that imports the pack, verifies
+authorization scope/freshness, builds the workgraph and context packs, records
+candidate selection, and emits Foundry import material. Foundry must not accept
+a direct Blueprint handoff for these classes.
+
 For docs-only live mutation preparation, AO Blueprint may mark the requirement
 as build-ready or blocked for clarification. That build authorization only lets
-the downstream stack consider the work; exact live mutation permission remains
-with the later Covenant ticket, Foundry approval gate, Forge guard, AO2 patch
-packet, Sentinel/Promoter boundaries, rollback rehearsal, Command readback, and
-operator approval.
+Atlas compile the work for downstream consideration; exact live mutation
+permission remains with the later Covenant ticket, Foundry approval gate, Forge
+guard, AO2 patch packet, Sentinel/Promoter boundaries, rollback rehearsal,
+Command readback, and operator approval.
 
 ## Failure Model
 

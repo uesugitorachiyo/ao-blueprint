@@ -26,7 +26,8 @@ Acceptance gate: valid fixture scores 100/100; invalid fixture is blocked.
 
 - SDD plan emit.
 - Build authorization with content digests.
-- AO Forge and AO Foundry handoff paths.
+- Downstream handoff paths, with AO Atlas required before AO Foundry for
+  oversized, mutation-class, or long-running work.
 - CLI commands for readiness, SDD, authorize, and inspect.
 
 Acceptance gate: authorization is ready for the valid pack and non-zero for the

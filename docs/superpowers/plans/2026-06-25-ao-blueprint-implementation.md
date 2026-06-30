@@ -12,7 +12,8 @@
 
 - Authorization fails closed unless score is 100, user approval is true, and no blockers exist.
 - Durable public artifacts must not contain local machine paths, raw tokens, private keys, or secret values.
-- The default downstream path is AO Blueprint -> AO Foundry -> AO Forge -> AO2.
+- The default downstream path for oversized, mutation-class, or long-running
+  work is AO Blueprint -> AO Atlas -> AO Foundry -> AO Forge -> AO2.
 - AO Blueprint must not execute target product implementation work.
 - The product gate is `./scripts/production-readiness.sh`.
 
