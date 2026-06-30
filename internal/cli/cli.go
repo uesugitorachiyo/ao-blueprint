@@ -305,7 +305,7 @@ func buildImplementationSpec(s session, answers string) string {
 	builder.WriteString("In scope: implement only requirements accepted in the reviewed blueprint pack.\n\n")
 	builder.WriteString("Out of scope: downstream AO automation must not add product scope, release mutation, provider calls, credential storage, or private evidence outside the authorized pack.\n\n")
 	builder.WriteString("## Stack\n\n")
-	builder.WriteString("Use the stack declared by the blueprint pack, preserve AO stack boundaries, and route governed execution through AO Foundry, AO Forge, AO Covenant, and AO2 as authorized.\n\n")
+	builder.WriteString("Use the stack declared by the blueprint pack, preserve AO stack boundaries, and route governed execution through AO Atlas, AO Foundry, AO Forge, AO Covenant, and AO2 as authorized.\n\n")
 	builder.WriteString("## Constraints\n\n")
 	builder.WriteString("Keep local-first defaults, scan public artifacts for secrets and local paths, preserve repository-relative evidence paths, and stop when authorization is blocked.\n\n")
 	builder.WriteString("## Verification\n\n")
@@ -322,7 +322,7 @@ func buildQualityProfile() string {
 Downstream implementation must prefer simple, readable, typed code with clear
 names, bounded functions, repository-local evidence, and no speculative
 abstractions. Framework-specific style belongs in the target repository, but
-the blueprint must declare the quality bar before AO Foundry or AO Forge starts
+the blueprint must declare the quality bar before AO Atlas, AO Foundry, or AO Forge starts
 building.
 
 ## TDD And Evals

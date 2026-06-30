@@ -2,7 +2,7 @@
 
 AO Blueprint is the front-door requirements interview, blueprint compiler, and
 build-authorization gate for the AO orchestration framework. It prevents vague
-ideas from entering AO Foundry or AO Forge until the user's objective,
+ideas from entering AO Atlas, AO Foundry, or AO Forge until the user's objective,
 constraints, domain model, contracts, tests, operations model, security posture,
 and production-readiness exit condition are specific enough to build.
 

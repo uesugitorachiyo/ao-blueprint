@@ -2,7 +2,7 @@
 
 ## Outcome
 
-AO Blueprint prevents vague product ideas from entering AO Foundry or AO Forge
+AO Blueprint prevents vague product ideas from entering AO Atlas, AO Foundry, or AO Forge
 until the user's objective, scope, constraints, contracts, tests, operations
 model, security posture, and production-readiness exit condition are explicit
 enough to build.
@@ -27,8 +27,8 @@ automation can validate before implementation starts.
 
 Build authorization must fail closed when user approval is missing, assumptions
 remain open, required artifacts are missing, JSON does not parse, unsafe public
-content is detected, or the next allowed action is outside AO Foundry or
-AO Forge.
+content is detected, or the next allowed action is outside AO Atlas,
+AO Foundry, or AO Forge.
 
 ## Verification
 

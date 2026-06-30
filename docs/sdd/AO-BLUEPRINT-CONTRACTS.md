@@ -42,7 +42,7 @@ Authorization requires:
 - no blocking assumptions;
 - matching digests for requirements, traceability, and SDD plan;
 - production-readiness exit condition present;
-- next allowed action targets AO Foundry or AO Forge.
+- next allowed action targets AO Atlas, AO Foundry, or AO Forge.
 
 The authorization contract is a build-readiness contract only. It can point a
 ready bounded requirement toward downstream AO implementation, but for

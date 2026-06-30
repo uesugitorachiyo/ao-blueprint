@@ -1,6 +1,7 @@
 package blueprint
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -62,6 +63,45 @@ func TestBoundedRSIControlSurfaceReadbackPackAuthorizesToFoundry(t *testing.T) {
 	}
 	if strings.Contains(strings.Join(auth.BlockingAssumptions, " "), "self-authorized") {
 		t.Fatalf("authorization must not allow Blueprint self-authorization: %+v", auth)
+	}
+}
+
+func TestAtlasRequiredPackRoutesReadinessAndAuthorizationToAtlas(t *testing.T) {
+	source := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
+	pack := filepath.Join(t.TempDir(), "pack")
+	if err := copyDirForTest(source, pack); err != nil {
+		t.Fatalf("copy valid pack: %v", err)
+	}
+	writeJSONForTest(t, filepath.Join(pack, "ao-foundry-task.json"), map[string]any{
+		"schema":                 "ao.foundry.task.v0.1",
+		"task_id":                "atlas-required-mutation-class",
+		"source":                 "ao-blueprint",
+		"authorization_required": true,
+		"atlas_required":         true,
+		"summary":                "Compile a mutation-class workgraph, context packs, candidate records, and Foundry import material.",
+		"exit_condition":         "AO Atlas emits the first safe Foundry import.",
+	})
+
+	audit, err := AuditPack(pack)
+	if err != nil {
+		t.Fatalf("AuditPack returned error: %v", err)
+	}
+	if audit.Status != "ready" || audit.Score != 100 {
+		t.Fatalf("audit status=%q score=%d blockers=%v, want ready score=100", audit.Status, audit.Score, audit.Blockers)
+	}
+	if audit.NextAllowedAction != "ao-atlas" {
+		t.Fatalf("audit next_allowed_action = %q, want ao-atlas", audit.NextAllowedAction)
+	}
+
+	auth, err := AuthorizePack(pack)
+	if err != nil {
+		t.Fatalf("AuthorizePack returned error: %v", err)
+	}
+	if auth.NextAllowedAction != audit.NextAllowedAction {
+		t.Fatalf("authorization route = %q, audit route = %q; want agreement", auth.NextAllowedAction, audit.NextAllowedAction)
+	}
+	if auth.NextAllowedAction != "ao-atlas" {
+		t.Fatalf("authorization next_allowed_action = %q, want ao-atlas", auth.NextAllowedAction)
 	}
 }
 
@@ -209,4 +249,16 @@ func copyDirForTest(source string, target string) error {
 		}
 		return os.WriteFile(dst, body, 0o644)
 	})
+}
+
+func writeJSONForTest(t *testing.T, path string, value any) {
+	t.Helper()
+	body, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		t.Fatalf("marshal %s: %v", path, err)
+	}
+	body = append(body, '\n')
+	if err := os.WriteFile(path, body, 0o644); err != nil {
+		t.Fatalf("write %s: %v", path, err)
+	}
 }
