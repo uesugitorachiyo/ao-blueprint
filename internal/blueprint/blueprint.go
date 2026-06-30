@@ -159,6 +159,7 @@ func AuditPack(pack string) (SufficiencyAudit, error) {
 		audit.Blockers = append(audit.Blockers, blocker("pack_missing", "blueprint pack directory is missing", pack))
 		return finalizeAudit(audit), fmt.Errorf("blueprint pack not found: %s", pack)
 	}
+	audit.NextAllowedAction = resolveNextAllowedAction(pack, audit.NextAllowedAction)
 
 	missingByFile := map[string]bool{}
 	for _, spec := range categorySpecs {
@@ -215,8 +216,8 @@ func AuditPack(pack string) (SufficiencyAudit, error) {
 	if strings.TrimSpace(audit.ProductionReadinessExitCondition) == "" {
 		audit.Blockers = append(audit.Blockers, blocker("exit_condition_missing", "production-readiness exit condition is required", "sufficiency-audit.json"))
 	}
-	if audit.NextAllowedAction != "ao-foundry" && audit.NextAllowedAction != "ao-forge" {
-		audit.Blockers = append(audit.Blockers, blocker("handoff_target_invalid", "next allowed action must be ao-foundry or ao-forge", "sufficiency-audit.json"))
+	if !validNextAllowedAction(audit.NextAllowedAction) {
+		audit.Blockers = append(audit.Blockers, blocker("handoff_target_invalid", "next allowed action must be ao-atlas, ao-atlas-then-foundry, ao-foundry, or ao-forge", "sufficiency-audit.json"))
 	}
 	if declared.Score > 0 && declared.Score != audit.Score {
 		audit.Blockers = append(audit.Blockers, blocker("score_mismatch", fmt.Sprintf("declared score %d does not match computed score %d", declared.Score, audit.Score), "sufficiency-audit.json"))
@@ -486,6 +487,98 @@ func digestDir(root string) (string, error) {
 func shouldSkipDir(name string) bool {
 	switch name {
 	case ".git", "tmp", "target", ".idea", ".vscode", "__pycache__":
+		return true
+	default:
+		return false
+	}
+}
+
+func resolveNextAllowedAction(pack string, declared string) string {
+	if packRequiresAtlas(pack) {
+		return "ao-atlas"
+	}
+	return declared
+}
+
+func packRequiresAtlas(pack string) bool {
+	if foundryTaskRequiresAtlas(filepath.Join(pack, "ao-foundry-task.json")) {
+		return true
+	}
+	for _, name := range []string{
+		"project-brief.md",
+		"prd.md",
+		"implementation-spec.md",
+		"implementation-slices.md",
+		"workflow-map.md",
+		"contracts.md",
+		"ao-foundry-task.json",
+		"sdd-plan.json",
+	} {
+		body, err := os.ReadFile(filepath.Join(pack, name))
+		if err != nil {
+			continue
+		}
+		if textRequiresAtlas(string(body)) {
+			return true
+		}
+	}
+	return false
+}
+
+func foundryTaskRequiresAtlas(path string) bool {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+	var task map[string]any
+	if err := json.Unmarshal(body, &task); err != nil {
+		return false
+	}
+	if required, ok := task["atlas_required"].(bool); ok && required {
+		return true
+	}
+	if maxRepos, ok := task["max_repos"].(float64); ok && maxRepos > 1 {
+		return true
+	}
+	if value, ok := task["foundry_import_scope"].(string); ok && strings.Contains(strings.ToLower(value), "repo-1") {
+		return true
+	}
+	return false
+}
+
+func textRequiresAtlas(text string) bool {
+	normalized := strings.ToLower(text)
+	strongSignals := []string{
+		"atlas workgraph",
+		"workgraph",
+		"context pack",
+		"context packs",
+		"candidate record",
+		"candidate records",
+		"mutation class",
+		"mutation-class",
+		"multi_repo_low_risk",
+		"low_risk_code",
+	}
+	count := 0
+	for _, signal := range strongSignals {
+		if strings.Contains(normalized, signal) {
+			count++
+		}
+	}
+	if count >= 2 && strings.Contains(normalized, "atlas") {
+		return true
+	}
+	return strings.Contains(normalized, "ao atlas") &&
+		strings.Contains(normalized, "foundry import") &&
+		(strings.Contains(normalized, "workgraph") ||
+			strings.Contains(normalized, "context pack") ||
+			strings.Contains(normalized, "candidate record"))
+}
+
+func validNextAllowedAction(action string) bool {
+	switch action {
+	case "ao-atlas", "ao-atlas-then-foundry", "ao-foundry", "ao-forge":
 		return true
 	default:
 		return false
