@@ -24,13 +24,17 @@ operator approval chain. Blueprint does not approve patches, create branches,
 execute work, call providers, publish, release, or grant broad live mutation
 authority.
 
-The bounded RSI self-improvement application Blueprint pack records planning
-authority only. `bounded_rsi_self_improvement_application` is proven only for
-the exact private readback/eval rubric rehearsal after downstream Atlas,
-Foundry, Promoter, and Command evidence close. `broad_RSI`, unrestricted
+The exact safe public claim wording evidence is already closed downstream; AO
+Blueprint is not creating a new pack for this documentation alignment.
+`exact_safe_public_claim_wording_conservative_readback_evidence` is proven only
+for conservative public-safe tracked readback evidence after downstream Foundry,
+Covenant, Architecture, Sentinel, Promoter, and Command evidence close. The
+approved public wording is exactly: "AO has public-safe tracked readback evidence
+for bounded improvement-claim review and retraction rehearsal; stronger
+recursive-improvement claims remain denied." `broad_RSI`, unrestricted
 self-modification, hidden instruction mutation, policy/auth/secret/provider/
-deploy/release/config/dependency expansion, and policy-changing autonomy remain
-denied. No new Blueprint is required for documenting this already-proven class.
+deploy/release/config/dependency expansion, policy-changing autonomy, and
+stronger recursive-improvement claims remain denied.
 
 Every ready blueprint pack must include `implementation-spec.md`, a concrete
 pre-SDD build contract with outcome, scope, stack, constraints, and verification
