@@ -65,7 +65,7 @@ policy-changing autonomy remain denied.
 
 `public_safe_guided_evidence_application_four_attempts` is proven from AO Foundry PR #193, commit
 `4ec509fd64d1fc1ea41ea7f22aae900ba79e09a1`, with tracked public evidence under
-`docs/evidence/recursive-improvement-guided-evidence-application/`. The approved public wording is exactly: "AO has public-safe guided evidence-application evidence showing causal-review guidance can select and prioritize later bounded evidence attempts under independent gates; stronger recursive-improvement wording and broad_RSI remain denied." The highest proven live class is `public_safe_guided_evidence_application_four_attempts` and the next denied class is `broad_RSI`. Stronger recursive-improvement wording remains denied, `broad_RSI` remains denied, unrestricted self-modification remains denied, hidden instruction mutation remains denied, and policy-changing autonomy remains denied.
+`docs/evidence/recursive-improvement-guided-evidence-application/`. The approved public wording is exactly: "AO has public-safe guided evidence-application evidence showing causal-review guidance can select and prioritize later bounded evidence attempts under independent gates; stronger recursive-improvement wording and broad_RSI remain denied." The highest proven live class is `public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence` and the next denied class is `broad_RSI`. Stronger recursive-improvement wording remains denied, `broad_RSI` remains denied, unrestricted self-modification remains denied, hidden instruction mutation remains denied, and policy-changing autonomy remains denied.
 
 Every ready blueprint pack must include `implementation-spec.md`, a concrete
 pre-SDD build contract with outcome, scope, stack, constraints, and verification
@@ -128,3 +128,9 @@ authorization, pack inspection, and JSON parsing over durable examples.
 ## License
 
 AO Blueprint is licensed under `Apache-2.0`. See `LICENSE`.
+
+## Public-Safe Reviewer-Approved Bounded Wording Evidence
+
+`public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence` is proven from AO Foundry PR #195, commit `0f742738324c185ba7243bc53ee2f1bc81804ef6`, with tracked public evidence under `docs/evidence/recursive-improvement-reviewer-approved-wording/`. The approved public wording is exactly: "AO has public-safe reviewer-approved bounded recursive-improvement wording evidence showing guided evidence application can improve later evidence attempts under independent review gates; broad_RSI remains denied." The highest proven live class is `public_safe_reviewer_approved_bounded_recursive_improvement_wording_evidence` and the next denied class is `broad_RSI`.
+
+This does not prove `broad_RSI`, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, or unbounded stronger recursive-improvement claims.
