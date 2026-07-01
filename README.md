@@ -43,11 +43,23 @@ public-safe bounded evidence expansion attempts are tracked with reproducibility
 runbooks: release/readiness evidence quality (`0.68` -> `0.91`), security/public-
 safety scan quality (`0.64` -> `0.90`), operator readback UX (`0.62` -> `0.88`),
 and cross-repo evidence linking (`0.60` -> `0.87`). The highest proven live class
-is `public_safe_bounded_improvement_evidence_expansion_four_attempts` and the next denied class is `broad_RSI`. Stronger
+is `public_safe_reviewed_causal_chain_boundary_generalization_evidence` and the next denied class is `broad_RSI`. Stronger
 recursive-improvement wording remains denied, `broad_RSI` remains denied,
 unrestricted self-modification remains denied, hidden instruction mutation
 remains denied, and policy-changing autonomy remains denied.
 
+`public_safe_reviewed_causal_chain_boundary_generalization_evidence` is now
+proven from AO Foundry PR #187, commit
+`ee55f7918b86f997922707e4c0b2ba6536fe43cf`, with tracked public evidence under
+`docs/evidence/recursive-improvement-reviewed-boundary-generalization/`. The
+approved public wording is exactly: "AO has public-safe reviewed causal-chain
+boundary generalization evidence across multiple independent claim-review roles;
+stronger recursive-improvement wording and broad_RSI remain denied." The highest
+proven live class is
+`public_safe_reviewed_causal_chain_boundary_generalization_evidence` and the next
+denied class is `broad_RSI`. Stronger recursive-improvement wording,
+`broad_RSI`, unrestricted self-modification, hidden instruction mutation, and
+policy-changing autonomy remain denied.
 
 Every ready blueprint pack must include `implementation-spec.md`, a concrete
 pre-SDD build contract with outcome, scope, stack, constraints, and verification
