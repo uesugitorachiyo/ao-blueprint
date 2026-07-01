@@ -24,6 +24,14 @@ operator approval chain. Blueprint does not approve patches, create branches,
 execute work, call providers, publish, release, or grant broad live mutation
 authority.
 
+The bounded RSI self-improvement application Blueprint pack records planning
+authority only. `bounded_rsi_self_improvement_application` is proven only for
+the exact private readback/eval rubric rehearsal after downstream Atlas,
+Foundry, Promoter, and Command evidence close. `broad_RSI`, unrestricted
+self-modification, hidden instruction mutation, policy/auth/secret/provider/
+deploy/release/config/dependency expansion, and policy-changing autonomy remain
+denied. No new Blueprint is required for documenting this already-proven class.
+
 Every ready blueprint pack must include `implementation-spec.md`, a concrete
 pre-SDD build contract with outcome, scope, stack, constraints, and verification
 sections. It must also include `quality-profile.md`, which records the
