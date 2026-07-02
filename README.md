@@ -65,7 +65,7 @@ policy-changing autonomy remain denied.
 
 `public_safe_guided_evidence_application_four_attempts` is proven from AO Foundry PR #193, commit
 `4ec509fd64d1fc1ea41ea7f22aae900ba79e09a1`, with tracked public evidence under
-`docs/evidence/recursive-improvement-guided-evidence-application/`. The approved public wording is exactly: "AO has public-safe guided evidence-application evidence showing causal-review guidance can select and prioritize later bounded evidence attempts under independent gates; stronger recursive-improvement wording and broad_RSI remain denied." This remains prior evidence; the current highest proven live class is `broad_RSI` and the next denied class is `unrestricted_self_modification`. Stronger recursive-improvement wording remains denied, `broad_RSI` remains denied, unrestricted self-modification remains denied, hidden instruction mutation remains denied, and policy-changing autonomy remains denied.
+`docs/evidence/recursive-improvement-guided-evidence-application/`. The approved public wording is exactly: "AO has public-safe guided evidence-application evidence showing causal-review guidance can select and prioritize later bounded evidence attempts under independent gates; stronger recursive-improvement wording and broad_RSI remain denied." This remains prior evidence after the unrestricted self-modification readiness-boundary map. Stronger recursive-improvement wording remains denied, unrestricted self-modification remains denied, hidden instruction mutation remains denied, and policy-changing autonomy remains denied.
 
 `public_safe_broad_RSI_governed_campaign_segment_07_evidence` is proven from AO
 Foundry PR #210, commit `8f8ac5f8f74d942c7a02a6c2dd39a7c974872bb6`, with
@@ -171,3 +171,23 @@ This does not prove `broad_RSI`, full 10-day campaign completion, final repeated
 `broad_RSI` is proven from AO Foundry PR #211, commit `630edc70905db745380edd1072e04b546dcccfe3`, with tracked public evidence under `docs/evidence/broad-rsi-ten-day-campaign-segment-08/`. The approved public wording is exactly: "AO has proven governed broad_RSI for public claim publication across the AO stack public-safe 10-day evidence campaign; unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied." Campaign completion is `2800 / 2800` nodes. `Blueprint` reads back `highest_proven_live_class=broad_RSI` and `next_denied_class=unrestricted_self_modification`.
 
 This does not prove unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, release/deploy/publish/upload/tag/provider calls, credential use, direct main mutation, concurrent mutation, or any unrestricted RSI claim.
+
+## Unrestricted Self-Modification Readiness Boundary Readback
+
+`public_safe_unrestricted_self_modification_readiness_boundary_map` is proven
+from AO Foundry PR #215, commit
+`e5ed75361554b1c90518c0e0df10b18adec77e5f`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-readiness-boundary/`. The approved
+public wording is exactly: "AO has public-safe readiness-boundary evidence for
+evaluating unrestricted self-modification; unrestricted self-modification,
+hidden instruction mutation, policy-changing autonomy, and forbidden surface
+expansion remain denied." `Blueprint` reads back
+`highest_proven_live_class=public_safe_unrestricted_self_modification_readiness_boundary_map`
+and `next_denied_class=unrestricted_self_modification`.
+
+This does not prove unrestricted self-modification, hidden instruction mutation,
+policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/
+dependency expansion, credential use, provider calls,
+release/deploy/publish/upload/tag authority, dependency update authority, direct
+main mutation, concurrent mutation, hidden instruction changes, or any
+unrestricted RSI claim.
