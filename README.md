@@ -166,6 +166,21 @@ This does not prove `broad_RSI`, unrestricted self-modification, hidden instruct
 
 This does not prove `broad_RSI`, full 10-day campaign completion, final repeated independent broad evidence, final cross-repo generality proof for `broad_RSI`, exact `broad_RSI` public-reader approval, exact `broad_RSI` Covenant or Architecture approval, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, policy/auth/secret/provider/deploy/release/config/dependency expansion, release/deploy/publish/upload/tag/provider calls, credential use, direct main mutation, concurrent mutation, or unbounded stronger recursive-improvement claims.
 
+## Bounded Sandboxed Self-Change Application Readback
+
+`public_safe_bounded_sandboxed_self_change_applications_non_readback_four_attempts`
+is proven from AO Foundry PR #220, commit
+`eff03edd62ba32af57defc71a7f3b800f320b8d3`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-bounded-sandbox-applications/`.
+The approved public wording is exactly: "AO has public-safe bounded sandboxed
+self-change application evidence across four non-readback exact-scope evidence
+tasks under sandbox containment gates; unrestricted self-modification, hidden
+instruction mutation, policy-changing autonomy, and forbidden surface expansion
+remain denied." Blueprint must route any next authority expansion through Atlas
+first. The highest proven live class is
+`public_safe_bounded_sandboxed_self_change_applications_non_readback_four_attempts`;
+the next denied class is `unrestricted_self_modification`.
+
 ## Governed Broad RSI Campaign Completion Readback
 
 `broad_RSI` is proven from AO Foundry PR #211, commit `630edc70905db745380edd1072e04b546dcccfe3`, with tracked public evidence under `docs/evidence/broad-rsi-ten-day-campaign-segment-08/`. The approved public wording is exactly: "AO has proven governed broad_RSI for public claim publication across the AO stack public-safe 10-day evidence campaign; unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied." Campaign completion is `2800 / 2800` nodes. `Blueprint` reads back `highest_proven_live_class=broad_RSI` and `next_denied_class=unrestricted_self_modification`.
