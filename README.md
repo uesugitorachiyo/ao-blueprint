@@ -361,6 +361,30 @@ Future unrestricted-self-modification-adjacent packs must still route to AO Atla
 
 ## Sandboxed External-Execution Dry-Run Packet Readback
 
-AO Blueprint records `public_safe_sandboxed_external_execution_dry_run_packet_evidence_four_attempts` as the current highest proven live class from AO Foundry PR #231, commit `18a609f430a9a7e91fc0e62aea4b5789144c9fec`, with tracked public evidence under `docs/evidence/sandboxed-external-execution-dry-run-packet/` and final rollup `docs/evidence/sandboxed-external-execution-dry-run-packet/final-rollup.json`. The approved public wording is exactly: "AO has public-safe sandboxed external-execution dry-run authority packet evidence across four exact-scope reversible attempts under sandbox containment gates; actual external execution authority, provider calls, credential use, sandbox containment bypass, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied."
+AO Blueprint records `public_safe_sandboxed_external_execution_dry_run_packet_evidence_four_attempts` as a prior proven live class from AO Foundry PR #231, commit `18a609f430a9a7e91fc0e62aea4b5789144c9fec`, with tracked public evidence under `docs/evidence/sandboxed-external-execution-dry-run-packet/` and final rollup `docs/evidence/sandboxed-external-execution-dry-run-packet/final-rollup.json`. The approved public wording is exactly: "AO has public-safe sandboxed external-execution dry-run authority packet evidence across four exact-scope reversible attempts under sandbox containment gates; actual external execution authority, provider calls, credential use, sandbox containment bypass, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, and forbidden surface expansion remain denied."
 
 Future unrestricted-self-modification-adjacent packs must still route to AO Atlas first. This evidence does not authorize actual external execution authority, provider calls, credential use, sandbox containment bypass, unrestricted self-modification, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, direct-main mutation, concurrent mutation, release/deploy/publish/upload/tag authority, dependency update authority, or broad public claims. The next denied class remains `unrestricted_self_modification`.
+
+## External-Execution Authority Readiness Boundary Readback
+
+AO Blueprint records `public_safe_external_execution_authority_readiness_boundary_map`
+as the current highest proven live class from AO Foundry PR #232, commit
+`b6f409946775bc19a04f5ca25a9aea91b9631707`, with tracked public evidence under
+`docs/evidence/external-execution-authority-readiness-boundary/` and final
+rollup
+`docs/evidence/external-execution-authority-readiness-boundary/final-rollup.json`.
+The approved public wording is exactly: "AO has public-safe external-execution
+authority readiness-boundary evidence across four exact-scope reversible dry-run
+attempts under sandbox containment gates; actual external execution authority,
+provider calls, credential use, sandbox containment bypass, unrestricted
+self-modification, hidden instruction mutation, policy-changing autonomy, and
+forbidden surface expansion remain denied."
+
+Future unrestricted-self-modification-adjacent packs must still route to AO Atlas
+first. This evidence does not authorize actual external execution authority,
+provider calls, credential use, sandbox containment bypass, unrestricted
+self-modification, hidden instruction mutation, policy-changing autonomy,
+forbidden surface expansion, direct-main mutation, concurrent mutation,
+release/deploy/publish/upload/tag authority, dependency update authority, or
+broad public claims. The next denied class remains
+`unrestricted_self_modification`.
