@@ -438,3 +438,26 @@ dependency updates, direct-main mutation, concurrent mutation, broad public
 claims, or unrestricted RSI. The highest proven live class is
 `public_safe_contained_external_command_self_change_application_four_attempts`;
 the next denied class is `unrestricted_self_modification`.
+
+## Sandbox Bypass Resistance Evidence Readback
+
+AO Blueprint records
+`public_safe_sandbox_bypass_resistance_evidence_four_attempts` from AO Foundry
+PR #235, commit `322bd8b2ce3b6f8134196d33b0f605e0fe68f938`, with tracked
+public evidence under
+`docs/evidence/unrestricted-self-modification-sandbox-bypass-resistance/` and
+final rollup
+`docs/evidence/unrestricted-self-modification-sandbox-bypass-resistance/final-rollup.json`.
+The approved public wording is exactly: "AO has public-safe sandbox containment bypass resistance evidence across four exact-scope reversible negative-control attempts under contained external-command self-change gates; unrestricted self-modification, sandbox containment bypass authority, provider calls, credential use, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, release/deploy/publish/upload/tag authority, dependency updates, direct-main mutation, concurrent mutation, and broad public claims remain denied."
+
+Blueprint treats this as Atlas-routed evidence/readback only. It does not create
+a new Blueprint pack for documentation alignment and does not authorize direct
+Foundry routing for higher-risk work. This evidence does not prove
+unrestricted self-modification, sandbox containment bypass authority, real
+sandbox escape, provider calls, credential use, hidden instruction mutation,
+policy-changing autonomy, forbidden surface expansion,
+release/deploy/publish/upload/tag authority, dependency updates, direct-main
+mutation, concurrent mutation, broad public claims, or unrestricted RSI. The
+highest proven live class is
+`public_safe_sandbox_bypass_resistance_evidence_four_attempts`; the next denied
+class is `unrestricted_self_modification`.
