@@ -461,3 +461,23 @@ mutation, concurrent mutation, broad public claims, or unrestricted RSI. The
 highest proven live class is
 `public_safe_sandbox_bypass_resistance_evidence_four_attempts`; the next denied
 class is `unrestricted_self_modification`.
+
+## Authority-Escalation Criteria Readback
+
+AO Blueprint records
+`public_safe_unrestricted_self_modification_authority_escalation_criteria_four_attempts`
+as the current highest proven live class from AO Foundry PR #236, commit
+`b5f3b9a4f3164635a0dff078675a15a03f7c2fb6`, with tracked public evidence under
+`docs/evidence/unrestricted-self-modification-authority-escalation-criteria/`
+and final rollup
+`docs/evidence/unrestricted-self-modification-authority-escalation-criteria/final-rollup.json`.
+The approved public wording is exactly: "AO has public-safe unrestricted self-modification authority-escalation criteria evidence across four exact-scope reversible readback and negative-control attempts under contained external-command self-change gates; unrestricted self-modification, sandbox containment bypass authority, real sandbox escape, provider calls, credential use, hidden instruction mutation, policy-changing autonomy, forbidden surface expansion, release/deploy/publish/upload/tag authority, dependency updates, direct-main mutation, concurrent mutation, and broad public claims remain denied."
+
+Future unrestricted-self-modification-adjacent packs must still route to AO
+Atlas first. This evidence does not authorize `unrestricted_self_modification`,
+sandbox containment bypass authority, real sandbox escape, provider calls,
+credential use, hidden instruction mutation, policy-changing autonomy,
+forbidden surface expansion, release/deploy/publish/upload/tag authority,
+dependency updates, direct-main mutation, concurrent mutation, broad public
+claims, or unrestricted RSI. The next denied class remains
+`unrestricted_self_modification`.
