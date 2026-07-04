@@ -1,0 +1,11 @@
+{
+  "schema": "ao.blueprint.traceability-matrix.v0.1",
+  "project_id": "ao-mission-gateway-hardening",
+  "rows": [
+    {"requirement_id": "REQ-001", "slice_ids": ["SLICE-001", "SLICE-002"], "evidence": ["build-authorization.json", "sufficiency-audit.json"]},
+    {"requirement_id": "REQ-002", "slice_ids": ["SLICE-003", "SLICE-004", "SLICE-005"], "evidence": ["AO Mission gateway tests"]},
+    {"requirement_id": "REQ-003", "slice_ids": ["SLICE-006", "SLICE-007", "SLICE-008"], "evidence": ["Atlas metadata", "Foundry smoke", "Command evidence"]},
+    {"requirement_id": "REQ-004", "slice_ids": ["SLICE-009", "SLICE-010"], "evidence": ["Sentinel fixture", "Covenant fixture"]},
+    {"requirement_id": "REQ-005", "slice_ids": ["SLICE-011", "SLICE-012"], "evidence": ["Promoter README", "Architecture verifier"]}
+  ]
+}

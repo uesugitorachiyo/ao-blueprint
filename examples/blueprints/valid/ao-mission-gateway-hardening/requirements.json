@@ -1,0 +1,11 @@
+{
+  "schema": "ao.blueprint.requirements.v0.1",
+  "project_id": "ao-mission-gateway-hardening",
+  "requirements": [
+    {"id": "REQ-001", "category": "routing", "description": "Authorization routes to AO Atlas first."},
+    {"id": "REQ-002", "category": "gateway", "description": "Telegram and A2A readbacks remain intent/readback only."},
+    {"id": "REQ-003", "category": "provenance", "description": "Timeline compaction and gateway readiness are bindable provenance."},
+    {"id": "REQ-004", "category": "safety", "description": "Sentinel and Covenant reject gateway authority or stale-language overclaims."},
+    {"id": "REQ-005", "category": "promotion", "description": "Promoter documents gateway readbacks as no-promotion evidence."}
+  ]
+}
