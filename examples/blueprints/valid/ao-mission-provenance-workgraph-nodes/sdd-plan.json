@@ -1,0 +1,29 @@
+{
+  "schema": "ao2.sdd-plan.v1",
+  "project_id": "ao-mission-provenance-workgraph-nodes",
+  "title": "AO Mission Provenance Workgraph Nodes",
+  "objective": "Compile AO Mission provenance sources into Atlas first-class blocked/readback workgraph nodes before Foundry import, while preserving no-execution gateway and scheduler boundaries.",
+  "slices": [
+    {"id": "SLICE-001", "title": "Atlas-first authorization", "acceptance": ["readiness next_allowed_action is ao-atlas", "authorization next_allowed_action is ao-atlas"]},
+    {"id": "SLICE-002", "title": "Mission import source inventory", "acceptance": ["source artifact names preserved", "source digests preserved"]},
+    {"id": "SLICE-003", "title": "Provenance node taxonomy", "acceptance": ["gateway readiness node defined", "timeline compaction node defined"]},
+    {"id": "SLICE-004", "title": "Blocked readback node state", "acceptance": ["provenance nodes blocked by default", "blocker explains readback-only boundary"]},
+    {"id": "SLICE-005", "title": "Digest-bound required evidence", "acceptance": ["required evidence includes source path", "required evidence includes sha256 digest"]},
+    {"id": "SLICE-006", "title": "Atlas CLI artifact emission", "acceptance": ["provenance workgraph output is optional", "input artifacts are not overwritten"]},
+    {"id": "SLICE-007", "title": "Foundry import boundary", "acceptance": ["Foundry import selects only ready executable node", "blocked provenance nodes are not imported"]},
+    {"id": "SLICE-008", "title": "Gateway readiness provenance", "acceptance": ["gateway_readiness_rollup node present", "correlation IDs remain readback only"]},
+    {"id": "SLICE-009", "title": "Timeline compaction provenance", "acceptance": ["timeline_compaction node present", "timeline digest remains readback only"]},
+    {"id": "SLICE-010", "title": "Command compact readback", "acceptance": ["timeline_compaction_bound displayed", "authority false"]},
+    {"id": "SLICE-011", "title": "Sentinel freshness positive fixture", "acceptance": ["valid freshness wording passes", "always-fresh fixture still fails"]},
+    {"id": "SLICE-012", "title": "Covenant A2A push denial", "acceptance": ["push notification execution field const false", "invalid true fixture fails"]},
+    {"id": "SLICE-013", "title": "Promoter no-promotion fixture", "acceptance": ["machine-readable fixture exists", "promotion_allowed false"]},
+    {"id": "SLICE-014", "title": "Architecture diagram update", "acceptance": ["A2A fixture server readback shown", "timeline compaction shown"]},
+    {"id": "SLICE-015", "title": "Blueprint example pack validation", "acceptance": ["lint passes", "readiness routes to ao-atlas"]},
+    {"id": "SLICE-016", "title": "Public-safety scan", "acceptance": ["no secrets", "no local private paths"]},
+    {"id": "SLICE-017", "title": "Repo verification", "acceptance": ["go test", "go vet"]},
+    {"id": "SLICE-018", "title": "Readiness verification", "acceptance": ["production-readiness passes", "git diff --check passes"]},
+    {"id": "SLICE-019", "title": "CI and PR merge", "acceptance": ["CI green", "branches cleaned"]},
+    {"id": "SLICE-020", "title": "Final rollup", "acceptance": ["completed tasks listed", "next recommended tasks listed"]}
+  ],
+  "stop_condition": "All provenance workgraph node readbacks are bound as provenance and no authority is widened."
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "ao.blueprint.risk.v0.1",
+  "project_id": "ao-mission-provenance-workgraph-nodes",
+  "risks": [
+    {"id": "RISK-001", "title": "Gateway authority widening", "severity": "critical", "mitigation": "Covenant and Sentinel invalid fixtures deny execution, approval, scheduling, and mutation claims.", "status": "mitigated"},
+    {"id": "RISK-002", "title": "Stale gateway replay treated as fresh", "severity": "high", "mitigation": "Telegram freshness classification and Sentinel stale-language sweep.", "status": "mitigated"},
+    {"id": "RISK-003", "title": "Foundry starts before Atlas context compilation", "severity": "high", "mitigation": "Authorization routes to ao-atlas and requires Atlas workgraph/context/candidate compilation.", "status": "mitigated"}
+  ]
+}

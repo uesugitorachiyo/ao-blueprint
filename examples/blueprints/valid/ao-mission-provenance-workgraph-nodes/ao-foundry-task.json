@@ -1,0 +1,10 @@
+{
+  "schema": "ao.foundry.task.v0.1",
+  "project_id": "ao-mission-provenance-workgraph-nodes",
+  "summary": "Compile AO Mission provenance workgraph nodes through AO Atlas before AO Foundry import.",
+  "requires_atlas": true,
+  "atlas_required": true,
+  "mutation_class": "docs_test_readback_hardening",
+  "acceptance": ["AO Atlas workgraph emitted", "Foundry import contains only first safe node", "gateway readbacks remain no-authority"],
+  "exit_condition": "AO Atlas emits workgraph, context packs, provenance metadata, and first safe Foundry import."
+}
