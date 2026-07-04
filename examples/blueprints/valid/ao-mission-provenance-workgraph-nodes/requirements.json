@@ -1,0 +1,11 @@
+{
+  "schema": "ao.blueprint.requirements.v0.1",
+  "project_id": "ao-mission-provenance-workgraph-nodes",
+  "requirements": [
+    {"id": "REQ-001", "category": "routing", "description": "Authorization routes to AO Atlas first."},
+    {"id": "REQ-002", "category": "provenance", "description": "AO Atlas materializes Mission source artifacts as first-class blocked/readback workgraph nodes."},
+    {"id": "REQ-003", "category": "provenance", "description": "Timeline compaction and gateway readiness nodes carry digest-bound required evidence."},
+    {"id": "REQ-004", "category": "safety", "description": "Blocked provenance nodes do not enter Foundry imports unless a separate gate makes a safe executable node ready."},
+    {"id": "REQ-005", "category": "promotion", "description": "Gateway and scheduler provenance remains no-promotion evidence."}
+  ]
+}
