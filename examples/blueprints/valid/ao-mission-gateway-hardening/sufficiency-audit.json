@@ -1,0 +1,22 @@
+{
+  "schema": "ao.blueprint.sufficiency-audit.v0.1",
+  "project_id": "ao-mission-gateway-hardening",
+  "status": "ready",
+  "score": 100,
+  "approved_by_user": true,
+  "blocking_assumptions": [],
+  "production_readiness_exit_condition": "AO Atlas compiles Mission gateway hardening workgraph/context/candidate records, AO Foundry imports only the first safe node, and all touched repos pass tests, vet, build, production readiness, public-safety, and CI.",
+  "next_allowed_action": "ao-atlas",
+  "categories": [
+    {"id": "objective", "points": 10, "status": "passed"},
+    {"id": "scope", "points": 10, "status": "passed"},
+    {"id": "domain_workflows", "points": 12, "status": "passed"},
+    {"id": "interfaces_contracts", "points": 10, "status": "passed"},
+    {"id": "data_integrations", "points": 8, "status": "passed"},
+    {"id": "security_privacy", "points": 10, "status": "passed"},
+    {"id": "tests_evaluation", "points": 12, "status": "passed"},
+    {"id": "operations_release", "points": 8, "status": "passed"},
+    {"id": "traceability", "points": 10, "status": "passed"},
+    {"id": "approval_handoff", "points": 10, "status": "passed"}
+  ]
+}

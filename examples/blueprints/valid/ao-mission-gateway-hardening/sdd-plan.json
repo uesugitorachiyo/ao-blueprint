@@ -1,0 +1,29 @@
+{
+  "schema": "ao2.sdd-plan.v1",
+  "project_id": "ao-mission-gateway-hardening",
+  "title": "AO Mission Gateway Hardening",
+  "objective": "Harden Mission gateway readback/provenance across Blueprint, Atlas, Foundry, Command, Sentinel, Covenant, Promoter, and Architecture.",
+  "slices": [
+    {"id": "SLICE-001", "title": "Atlas-first authorization", "acceptance": ["readiness next_allowed_action is ao-atlas", "authorization next_allowed_action is ao-atlas"]},
+    {"id": "SLICE-002", "title": "Atlas workgraph design", "acceptance": ["one first safe node", "context packs required"]},
+    {"id": "SLICE-003", "title": "Telegram freshness contract", "acceptance": ["fresh stale unknown states recorded", "no always-fresh claim"]},
+    {"id": "SLICE-004", "title": "A2A fixture-server readback", "acceptance": ["Agent Card path recorded", "JSON-RPC path recorded"]},
+    {"id": "SLICE-005", "title": "Gateway no-authority flags", "acceptance": ["safe_to_execute false", "executes_work false"]},
+    {"id": "SLICE-006", "title": "Timeline compaction contract", "acceptance": ["timeline digest recorded", "readback only"]},
+    {"id": "SLICE-007", "title": "Atlas Mission import", "acceptance": ["timeline compaction accepted", "gateway readiness accepted"]},
+    {"id": "SLICE-008", "title": "Atlas provenance nodes", "acceptance": ["timeline_compaction node present", "gateway_readiness_rollup node present"]},
+    {"id": "SLICE-009", "title": "Foundry e2e smoke", "acceptance": ["timeline compaction bound", "mission provenance preserved"]},
+    {"id": "SLICE-010", "title": "Command evidence readback", "acceptance": ["timeline_compaction kind emitted", "authority false"]},
+    {"id": "SLICE-011", "title": "Sentinel freshness detector", "acceptance": ["always fresh fixture fails", "valid gateway docs pass"]},
+    {"id": "SLICE-012", "title": "Covenant push denial", "acceptance": ["push notification execution fixture fails", "denial bundle unchanged"]},
+    {"id": "SLICE-013", "title": "Promoter no-promotion wording", "acceptance": ["promotion_allowed false documented", "gateway readbacks do not promote"]},
+    {"id": "SLICE-014", "title": "Architecture contract map", "acceptance": ["timeline compaction listed", "A2A fixture server listed"]},
+    {"id": "SLICE-015", "title": "Architecture sequences", "acceptance": ["Telegram freshness sequence", "timeline compaction sequence"]},
+    {"id": "SLICE-016", "title": "Public-safety scan", "acceptance": ["no secrets", "no local private paths"]},
+    {"id": "SLICE-017", "title": "Repo verification", "acceptance": ["go test", "go vet"]},
+    {"id": "SLICE-018", "title": "Readiness verification", "acceptance": ["production-readiness passes", "git diff --check passes"]},
+    {"id": "SLICE-019", "title": "CI and PR merge", "acceptance": ["CI green", "branches cleaned"]},
+    {"id": "SLICE-020", "title": "Final rollup", "acceptance": ["completed tasks listed", "next recommended tasks listed"]}
+  ],
+  "stop_condition": "All gateway hardening readbacks are bound as provenance and no authority is widened."
+}
