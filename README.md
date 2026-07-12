@@ -1,5 +1,40 @@
 # AO Blueprint
 
+## Role
+
+AO Blueprint owns requirements sufficiency, traceability, and bounded build
+authorization. It hands oversized or mutation-class work to Atlas after the
+operator approves a complete pack. See [AO Architecture](https://github.com/uesugitorachiyo/ao-architecture)
+and the [canonical AO Blueprint component page](https://github.com/uesugitorachiyo/ao-architecture/blob/main/components/ao-blueprint.md).
+
+## Maturity
+
+Early alpha. Deterministic compilation is `implemented` and
+`executable-tested`; cross-stack authorization scenarios remain `fixture-only`.
+
+## Install
+
+```sh
+go build -o ./tmp/blueprint ./cmd/blueprint
+```
+
+## Quickstart
+
+```sh
+./tmp/blueprint --help
+```
+
+## Safety
+
+Blueprint may authorize a governed plan. It does not approve patches, schedule
+work, call providers, use credentials, mutate repositories, or publish releases.
+
+## External Beta
+
+External beta has not launched. No promotion is requested. RSI remains denied.
+Historical campaign evidence is cataloged by AO Architecture and is not current
+product authority.
+
 AO Blueprint is the front-door requirements interview, blueprint compiler, and
 build-authorization gate for the AO orchestration framework. It prevents vague
 ideas from entering AO Atlas, AO Foundry, or AO Forge until the user's objective,
