@@ -85,6 +85,7 @@ Usage:
   blueprint sdd emit --pack <dir> --out <json>
   blueprint authorize --pack <dir> --out <json>
   blueprint pack inspect --pack <dir> --json
+  blueprint pack canonical-compatibility --pack <dir> --out <json> --json
 
 Commands: interview compile lint readiness sdd authorize pack`)
 }
@@ -184,25 +185,47 @@ func printHandoffPrompt(stdout io.Writer, pack string, promptPath string) {
 }
 
 func runPack(args []string, stdout io.Writer) error {
-	if len(args) == 0 || args[0] != "inspect" {
-		return errors.New("usage: blueprint pack inspect --pack <dir> [--json]")
+	if len(args) == 0 {
+		return errors.New("usage: blueprint pack <inspect|canonical-compatibility> --pack <dir>")
 	}
-	flags := parseFlags(args[1:])
-	pack := flags["pack"]
-	if pack == "" {
-		return errors.New("usage: blueprint pack inspect --pack <dir> [--json]")
-	}
-	inspection, err := blueprint.InspectPack(pack)
-	if _, jsonMode := flags["json"]; jsonMode {
-		body, marshalErr := json.MarshalIndent(inspection, "", "  ")
-		if marshalErr != nil {
-			return marshalErr
+	switch args[0] {
+	case "inspect":
+		flags := parseFlags(args[1:])
+		pack := flags["pack"]
+		if pack == "" {
+			return errors.New("usage: blueprint pack inspect --pack <dir> [--json]")
 		}
-		fmt.Fprintln(stdout, string(body))
+		inspection, err := blueprint.InspectPack(pack)
+		if _, jsonMode := flags["json"]; jsonMode {
+			body, marshalErr := json.MarshalIndent(inspection, "", "  ")
+			if marshalErr != nil {
+				return marshalErr
+			}
+			fmt.Fprintln(stdout, string(body))
+			return err
+		}
+		fmt.Fprintf(stdout, "pack: %s artifacts=%d status=%s\n", inspection.ProjectID, inspection.ArtifactCount, inspection.Status)
 		return err
+	case "canonical-compatibility":
+		flags := parseFlags(args[1:])
+		pack := flags["pack"]
+		out := flags["out"]
+		if pack == "" || out == "" {
+			return errors.New("usage: blueprint pack canonical-compatibility --pack <dir> --out <json> [--json]")
+		}
+		readback, err := blueprint.BuildCanonicalRegistryCompatibility(pack)
+		if writeErr := blueprint.WriteJSON(out, readback); writeErr != nil {
+			return writeErr
+		}
+		if _, jsonMode := flags["json"]; jsonMode {
+			fmt.Fprintf(stdout, "canonical_registry_compatibility=%s project_id=%s registry_compatible=%t\n", readback.Status, readback.ProjectID, readback.RegistryCompatible)
+		} else {
+			fmt.Fprintf(stdout, "canonical registry compatibility: %s project_id=%s\n", readback.Status, readback.ProjectID)
+		}
+		return err
+	default:
+		return errors.New("usage: blueprint pack <inspect|canonical-compatibility> --pack <dir>")
 	}
-	fmt.Fprintf(stdout, "pack: %s artifacts=%d status=%s\n", inspection.ProjectID, inspection.ArtifactCount, inspection.Status)
-	return err
 }
 
 func runCompile(args []string, stdout io.Writer) error {

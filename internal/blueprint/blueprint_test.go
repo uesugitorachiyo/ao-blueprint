@@ -105,6 +105,42 @@ func TestAtlasRequiredPackRoutesReadinessAndAuthorizationToAtlas(t *testing.T) {
 	}
 }
 
+func TestCanonicalRegistryCompatibilityBindsBlueprintPackBytes(t *testing.T) {
+	pack := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
+
+	readback, err := BuildCanonicalRegistryCompatibility(pack)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if readback.Schema != "ao.blueprint.canonical-registry-compatibility.v0.1" ||
+		readback.Status != "ready" ||
+		readback.ProjectID != "ao-blueprint-self" ||
+		readback.CanonicalBytesEncoding != "directory-path-null-byte-content-null-byte" ||
+		readback.CanonicalBytesDigest == "" ||
+		readback.CanonicalBytesDigest != readback.BlueprintPackDigest ||
+		readback.ArtifactDigestCount < 4 ||
+		!readback.RegistryCompatible ||
+		!readback.CanonicalBytesBound ||
+		!readback.ArtifactDigestsBound ||
+		!readback.NoPromotionRequested ||
+		readback.ClaimsAuthorityAdvance ||
+		!readback.RSIRemainsDenied ||
+		readback.SafeToExecute ||
+		readback.ExecutesWork ||
+		readback.ApprovesWork ||
+		readback.MutatesRepositories {
+		t.Fatalf("canonical registry compatibility readback drifted: %+v", readback)
+	}
+	for _, name := range []string{"requirements.json", "traceability-matrix.json", "sdd-plan.json", "ao-foundry-task.json"} {
+		if readback.ArtifactDigests[name] == "" {
+			t.Fatalf("missing artifact digest for %s: %+v", name, readback.ArtifactDigests)
+		}
+	}
+	if err := ValidateCanonicalRegistryCompatibility(readback); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestMissingImplementationSpecBlocksReadiness(t *testing.T) {
 	source := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
 	pack := filepath.Join(t.TempDir(), "pack")
