@@ -105,6 +105,32 @@ func TestAuthorizeCommandPrintsAtlasFirstHandoffGuidance(t *testing.T) {
 	}
 }
 
+func TestPackCanonicalCompatibilityCommandWritesRegistryReadback(t *testing.T) {
+	pack := filepath.Join(rootDir(t), "examples", "blueprints", "valid", "ao-blueprint-self")
+	out := filepath.Join(t.TempDir(), "canonical-compatibility.json")
+
+	stdout, _, err := runCLI("pack", "canonical-compatibility", "--pack", pack, "--out", out, "--json")
+	if err != nil {
+		t.Fatalf("canonical compatibility returned error: %v", err)
+	}
+	if !strings.Contains(stdout, "canonical_registry_compatibility=ready") {
+		t.Fatalf("unexpected stdout: %s", stdout)
+	}
+	var body map[string]any
+	readJSON(t, out, &body)
+	if body["schema"] != "ao.blueprint.canonical-registry-compatibility.v0.1" ||
+		body["status"] != "ready" ||
+		body["registry_compatible"] != true ||
+		body["canonical_bytes_bound"] != true ||
+		body["artifact_digests_bound"] != true ||
+		body["no_promotion_requested"] != true ||
+		body["claims_authority_advance"] != false ||
+		body["rsi_remains_denied"] != true ||
+		body["safe_to_execute"] != false {
+		t.Fatalf("bad canonical compatibility body: %#v", body)
+	}
+}
+
 func TestInterviewCommandsAdvanceSession(t *testing.T) {
 	session := filepath.Join(t.TempDir(), "session.json")
 

@@ -15,10 +15,11 @@ import (
 )
 
 const (
-	AuditSchema         = "ao.blueprint.sufficiency-audit.v0.1"
-	AuthorizationSchema = "ao.blueprint.build-authorization.v0.1"
-	LintSchema          = "ao.blueprint.lint-report.v0.1"
-	InspectionSchema    = "ao.blueprint.pack-inspection.v0.1"
+	AuditSchema                          = "ao.blueprint.sufficiency-audit.v0.1"
+	AuthorizationSchema                  = "ao.blueprint.build-authorization.v0.1"
+	LintSchema                           = "ao.blueprint.lint-report.v0.1"
+	InspectionSchema                     = "ao.blueprint.pack-inspection.v0.1"
+	CanonicalRegistryCompatibilitySchema = "ao.blueprint.canonical-registry-compatibility.v0.1"
 )
 
 type Diagnostic struct {
@@ -91,6 +92,28 @@ type PackInspection struct {
 	ArtifactCount int          `json:"artifact_count"`
 	Artifacts     []string     `json:"artifacts"`
 	Blockers      []Diagnostic `json:"blockers,omitempty"`
+}
+
+type CanonicalRegistryCompatibility struct {
+	Schema                 string            `json:"schema"`
+	Status                 string            `json:"status"`
+	ProjectID              string            `json:"project_id"`
+	CanonicalBytesEncoding string            `json:"canonical_bytes_encoding"`
+	CanonicalBytesDigest   string            `json:"canonical_bytes_digest"`
+	BlueprintPackDigest    string            `json:"blueprint_pack_digest"`
+	ArtifactDigestCount    int               `json:"artifact_digest_count"`
+	ArtifactDigests        map[string]string `json:"artifact_digests"`
+	RegistryCompatible     bool              `json:"registry_compatible"`
+	CanonicalBytesBound    bool              `json:"canonical_bytes_bound"`
+	ArtifactDigestsBound   bool              `json:"artifact_digests_bound"`
+	NoPromotionRequested   bool              `json:"no_promotion_requested"`
+	ClaimsAuthorityAdvance bool              `json:"claims_authority_advance"`
+	RSIRemainsDenied       bool              `json:"rsi_remains_denied"`
+	SafeToExecute          bool              `json:"safe_to_execute"`
+	ExecutesWork           bool              `json:"executes_work"`
+	ApprovesWork           bool              `json:"approves_work"`
+	MutatesRepositories    bool              `json:"mutates_repositories"`
+	Blockers               []Diagnostic      `json:"blockers,omitempty"`
 }
 
 type categorySpec struct {
@@ -317,6 +340,114 @@ func InspectPack(pack string) (PackInspection, error) {
 	sort.Strings(inspection.Artifacts)
 	inspection.ArtifactCount = len(inspection.Artifacts)
 	return inspection, err
+}
+
+func BuildCanonicalRegistryCompatibility(pack string) (CanonicalRegistryCompatibility, error) {
+	pack = filepath.Clean(pack)
+	audit, auditErr := AuditPack(pack)
+	readback := CanonicalRegistryCompatibility{
+		Schema:                 CanonicalRegistryCompatibilitySchema,
+		Status:                 "blocked",
+		ProjectID:              audit.ProjectID,
+		CanonicalBytesEncoding: "directory-path-null-byte-content-null-byte",
+		ArtifactDigests:        map[string]string{},
+		NoPromotionRequested:   true,
+		ClaimsAuthorityAdvance: false,
+		RSIRemainsDenied:       true,
+		SafeToExecute:          false,
+		ExecutesWork:           false,
+		ApprovesWork:           false,
+		MutatesRepositories:    false,
+		Blockers:               append([]Diagnostic{}, audit.Blockers...),
+	}
+	if readback.ProjectID == "" {
+		readback.ProjectID = filepath.Base(pack)
+	}
+	if auditErr != nil {
+		readback.Blockers = append(readback.Blockers, blocker("audit_blocked", auditErr.Error(), pack))
+		return readback, auditErr
+	}
+	packDigest, err := digestDir(pack)
+	if err != nil {
+		readback.Blockers = append(readback.Blockers, blocker("canonical_digest_failed", err.Error(), pack))
+		return readback, err
+	}
+	readback.CanonicalBytesDigest = packDigest
+	readback.BlueprintPackDigest = packDigest
+	for _, name := range []string{"requirements.json", "traceability-matrix.json", "sdd-plan.json", "ao-foundry-task.json"} {
+		digest, err := digestFile(filepath.Join(pack, name))
+		if err != nil {
+			readback.Blockers = append(readback.Blockers, blocker("artifact_digest_failed", err.Error(), name))
+			return readback, err
+		}
+		readback.ArtifactDigests[name] = digest
+	}
+	readback.ArtifactDigestCount = len(readback.ArtifactDigests)
+	readback.CanonicalBytesBound = readback.CanonicalBytesDigest != "" && readback.CanonicalBytesDigest == readback.BlueprintPackDigest
+	readback.ArtifactDigestsBound = readback.ArtifactDigestCount == 4
+	readback.RegistryCompatible = audit.Status == "ready" && readback.CanonicalBytesBound && readback.ArtifactDigestsBound
+	if readback.RegistryCompatible {
+		readback.Status = "ready"
+		readback.Blockers = nil
+	}
+	if err := ValidateCanonicalRegistryCompatibility(readback); err != nil {
+		return readback, err
+	}
+	return readback, nil
+}
+
+func ValidateCanonicalRegistryCompatibility(readback CanonicalRegistryCompatibility) error {
+	var errs []string
+	if readback.Schema != CanonicalRegistryCompatibilitySchema {
+		errs = append(errs, "canonical registry compatibility schema mismatch")
+	}
+	if readback.Status != "ready" && readback.Status != "blocked" {
+		errs = append(errs, "canonical registry compatibility status must be ready or blocked")
+	}
+	if strings.TrimSpace(readback.ProjectID) == "" {
+		errs = append(errs, "canonical registry compatibility requires project_id")
+	}
+	if readback.CanonicalBytesEncoding != "directory-path-null-byte-content-null-byte" {
+		errs = append(errs, "canonical bytes encoding mismatch")
+	}
+	for field, value := range map[string]string{
+		"canonical_bytes_digest": readback.CanonicalBytesDigest,
+		"blueprint_pack_digest":  readback.BlueprintPackDigest,
+	} {
+		if !strings.HasPrefix(value, "sha256:") {
+			errs = append(errs, field+" must start with sha256:")
+		}
+	}
+	if readback.CanonicalBytesDigest != readback.BlueprintPackDigest {
+		errs = append(errs, "canonical bytes digest must match blueprint pack digest")
+	}
+	if readback.ArtifactDigestCount != len(readback.ArtifactDigests) {
+		errs = append(errs, "artifact_digest_count must match artifact_digests length")
+	}
+	for _, name := range []string{"requirements.json", "traceability-matrix.json", "sdd-plan.json", "ao-foundry-task.json"} {
+		if !strings.HasPrefix(readback.ArtifactDigests[name], "sha256:") {
+			errs = append(errs, name+" digest must start with sha256:")
+		}
+	}
+	if readback.Status == "ready" && (!readback.RegistryCompatible || !readback.CanonicalBytesBound || !readback.ArtifactDigestsBound || len(readback.Blockers) != 0) {
+		errs = append(errs, "ready canonical registry compatibility requires bound digests, registry compatibility, and no blockers")
+	}
+	if !readback.NoPromotionRequested {
+		errs = append(errs, "no_promotion_requested must be true")
+	}
+	if readback.ClaimsAuthorityAdvance {
+		errs = append(errs, "claims_authority_advance must be false")
+	}
+	if !readback.RSIRemainsDenied {
+		errs = append(errs, "rsi_remains_denied must be true")
+	}
+	if readback.SafeToExecute || readback.ExecutesWork || readback.ApprovesWork || readback.MutatesRepositories {
+		errs = append(errs, "canonical registry compatibility must not execute, approve, or mutate")
+	}
+	if len(errs) > 0 {
+		return fmt.Errorf(strings.Join(errs, "; "))
+	}
+	return nil
 }
 
 func LintPath(path string) (LintReport, error) {
