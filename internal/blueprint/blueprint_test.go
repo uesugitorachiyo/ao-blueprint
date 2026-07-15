@@ -105,6 +105,105 @@ func TestAtlasRequiredPackRoutesReadinessAndAuthorizationToAtlas(t *testing.T) {
 	}
 }
 
+func TestCompatibilityVectorBlueprintAuthorizationToAtlasContext(t *testing.T) {
+	root := repoRoot(t)
+	path := filepath.Join(root, "examples", "compatibility", "blueprint-authorization-to-atlas-context-v0.1.json")
+	body, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var vector struct {
+		SchemaVersion string `json:"schema_version"`
+		Edge          string `json:"edge"`
+		Producer      struct {
+			Repository string `json:"repository"`
+			SourcePack string `json:"source_pack"`
+		} `json:"producer"`
+		Consumer struct {
+			Repository string `json:"repository"`
+		} `json:"consumer"`
+		RequirementsAuthorization struct {
+			AuthorizationSchema    string   `json:"authorization_schema"`
+			RequirementsSchema     string   `json:"requirements_schema"`
+			ProjectID              string   `json:"project_id"`
+			Status                 string   `json:"status"`
+			Score                  int      `json:"score"`
+			ApprovedByUser         bool     `json:"approved_by_user"`
+			BlockingAssumptions    []string `json:"blocking_assumptions"`
+			NextAllowedAction      string   `json:"next_allowed_action"`
+			RequiredRequirementIDs []string `json:"required_requirement_ids"`
+		} `json:"requirements_authorization"`
+		ExpectedAtlas struct {
+			ImportContract      string `json:"import_contract"`
+			ImportStatus        string `json:"import_status"`
+			ReadyForFoundry     bool   `json:"ready_for_foundry"`
+			WorkgraphContract   string `json:"workgraph_contract"`
+			ContextPackContract string `json:"context_pack_contract"`
+			NextSafeRoute       string `json:"next_safe_route"`
+		} `json:"expected_atlas"`
+		Boundaries struct {
+			ReleaseOrPublish      bool `json:"release_or_publish"`
+			CreatesTag            bool `json:"creates_tag"`
+			UploadsAssets         bool `json:"uploads_assets"`
+			Deploys               bool `json:"deploys"`
+			ContactsExternalUsers bool `json:"contacts_external_users"`
+			ProviderPilot         bool `json:"provider_pilot"`
+			PromotionGranted      bool `json:"promotion_granted"`
+			RSIRemainsDenied      bool `json:"rsi_remains_denied"`
+			ExecutesWork          bool `json:"executes_work"`
+			ApprovesWork          bool `json:"approves_work"`
+			MutatesRepositories   bool `json:"mutates_repositories"`
+		} `json:"boundaries"`
+	}
+	if err := json.Unmarshal(body, &vector); err != nil {
+		t.Fatal(err)
+	}
+	if vector.SchemaVersion != "ao.compatibility.blueprint-authorization-to-atlas-context-vector.v1" ||
+		vector.Edge != "ao-blueprint.requirements_authorization -> ao-atlas.context_pack_workgraph" ||
+		vector.Producer.Repository != "ao-blueprint" ||
+		vector.Consumer.Repository != "ao-atlas" {
+		t.Fatalf("bad Blueprint to Atlas vector identity: %+v", vector)
+	}
+	if vector.Boundaries.ReleaseOrPublish ||
+		vector.Boundaries.CreatesTag ||
+		vector.Boundaries.UploadsAssets ||
+		vector.Boundaries.Deploys ||
+		vector.Boundaries.ContactsExternalUsers ||
+		vector.Boundaries.ProviderPilot ||
+		vector.Boundaries.PromotionGranted ||
+		vector.Boundaries.ExecutesWork ||
+		vector.Boundaries.ApprovesWork ||
+		vector.Boundaries.MutatesRepositories ||
+		!vector.Boundaries.RSIRemainsDenied {
+		t.Fatalf("Blueprint to Atlas vector widened authority: %+v", vector.Boundaries)
+	}
+	pack := filepath.Join(root, filepath.FromSlash(vector.Producer.SourcePack))
+	auth, err := AuthorizePack(pack)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if vector.RequirementsAuthorization.AuthorizationSchema != AuthorizationSchema ||
+		vector.RequirementsAuthorization.RequirementsSchema != "ao.blueprint.requirements.v0.1" ||
+		vector.RequirementsAuthorization.ProjectID != auth.ProjectID ||
+		vector.RequirementsAuthorization.Status != auth.Status ||
+		vector.RequirementsAuthorization.Score != auth.Score ||
+		vector.RequirementsAuthorization.ApprovedByUser != auth.ApprovedByUser ||
+		len(vector.RequirementsAuthorization.BlockingAssumptions) != 0 ||
+		vector.RequirementsAuthorization.NextAllowedAction != "ao-atlas" ||
+		auth.NextAllowedAction != "ao-atlas" {
+		t.Fatalf("Blueprint authorization vector does not match pack authorization: vector=%+v auth=%+v", vector.RequirementsAuthorization, auth)
+	}
+	if len(vector.RequirementsAuthorization.RequiredRequirementIDs) != 5 ||
+		vector.ExpectedAtlas.ImportContract != "ao.atlas.blueprint-import.v0.1" ||
+		vector.ExpectedAtlas.ImportStatus != "ready" ||
+		!vector.ExpectedAtlas.ReadyForFoundry ||
+		vector.ExpectedAtlas.WorkgraphContract != "ao.atlas.workgraph.v0.1" ||
+		vector.ExpectedAtlas.ContextPackContract != "ao.atlas.context-pack.v0.1" ||
+		vector.ExpectedAtlas.NextSafeRoute != "ao-foundry" {
+		t.Fatalf("bad expected Atlas consumer contract: %+v", vector.ExpectedAtlas)
+	}
+}
+
 func TestCanonicalRegistryCompatibilityBindsBlueprintPackBytes(t *testing.T) {
 	pack := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
 
