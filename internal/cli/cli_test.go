@@ -131,6 +131,76 @@ func TestPackCanonicalCompatibilityCommandWritesRegistryReadback(t *testing.T) {
 	}
 }
 
+func TestConsumesArchitectureSourceTruthAuthorizationScopeVector(t *testing.T) {
+	path := filepath.Join(rootDir(t), "examples", "compatibility", "architecture-source-truth-to-blueprint-authorization-scope-v0.1.json")
+
+	var vector map[string]any
+	readJSON(t, path, &vector)
+
+	if vector["schema_version"] != "ao.compatibility.architecture-source-truth-to-blueprint-authorization-scope-vector.v1" ||
+		vector["edge"] != "ao-architecture.source_of_truth -> ao-blueprint.authorization_scope" {
+		t.Fatalf("unexpected architecture vector identity: %#v", vector)
+	}
+
+	producer := vector["producer"].(map[string]any)
+	consumer := vector["consumer"].(map[string]any)
+	if producer["repository"] != "ao-architecture" ||
+		consumer["repository"] != "ao-blueprint" ||
+		consumer["expected_schema"] != "ao.blueprint.authorization-scope.v1" {
+		t.Fatalf("unexpected producer/consumer: producer=%#v consumer=%#v", producer, consumer)
+	}
+
+	source := vector["source_of_truth"].(map[string]any)
+	if source["ao2_version"] != "v0.5.1" ||
+		source["control_plane_version"] != "v0.1.15" ||
+		int(source["canonical_vector_count"].(float64)) != 15 ||
+		int(source["consumer_test_count"].(float64)) != 15 ||
+		source["full_stack_compatibility_complete"] != false ||
+		source["external_beta_launched"] != false ||
+		source["promotion_requested"] != false ||
+		source["promotion_granted"] != false ||
+		source["rsi_remains_denied"] != true {
+		t.Fatalf("unexpected source-of-truth readback: %#v", source)
+	}
+
+	scope := vector["authorization_scope"].(map[string]any)
+	if scope["schema_version"] != "ao.blueprint.authorization-scope.v1" ||
+		scope["status"] != "ready" ||
+		scope["scope_boundary"] != "compatibility_evidence_only" ||
+		scope["next_allowed_action"] != "ao-atlas-workgraph-readback" {
+		t.Fatalf("unexpected authorization scope: %#v", scope)
+	}
+
+	expected := vector["expected_blueprint_authorization_scope"].(map[string]any)
+	if expected["schema_version"] != "ao.blueprint.authorization-scope-readback.v1" ||
+		expected["status"] != "ready" ||
+		expected["full_stack_compatibility_complete"] != false {
+		t.Fatalf("unexpected Blueprint readback expectation: %#v", expected)
+	}
+
+	boundaries := vector["boundaries"].(map[string]any)
+	for _, forbidden := range []string{
+		"release_or_publish",
+		"creates_tag",
+		"uploads_assets",
+		"deploys",
+		"contacts_external_users",
+		"provider_pilot",
+		"promotion_requested",
+		"promotion_granted",
+		"executes_work",
+		"approves_work",
+		"mutates_repositories",
+	} {
+		if boundaries[forbidden] != false {
+			t.Fatalf("boundary %s = %#v, want false", forbidden, boundaries[forbidden])
+		}
+	}
+	if boundaries["rsi_remains_denied"] != true {
+		t.Fatalf("rsi_remains_denied = %#v, want true", boundaries["rsi_remains_denied"])
+	}
+}
+
 func TestInterviewCommandsAdvanceSession(t *testing.T) {
 	session := filepath.Join(t.TempDir(), "session.json")
 
