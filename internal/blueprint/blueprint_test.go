@@ -139,6 +139,57 @@ func TestGitHubIssueBoundedClaimFixtureDoesNotGrantActionAuthority(t *testing.T)
 	}
 }
 
+func TestGitHubIssueReproductionPlanRequiresFailingPrePatchReproAndNoAuthority(t *testing.T) {
+	path := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "github-issue-reproduction-plan", "reproduction-plan.json")
+	body, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var plan map[string]any
+	if err := json.Unmarshal(body, &plan); err != nil {
+		t.Fatal(err)
+	}
+	if plan["schema_version"] != "ao.blueprint.github-issue-reproduction-plan.v0.1" ||
+		plan["plan_id"] != "github-issue-month2-reproduction-plan" {
+		t.Fatalf("unexpected reproduction plan identity: %#v", plan)
+	}
+	source := plan["source_issue"].(map[string]any)
+	if source["snapshot_required"] != true || source["issue_content_is_untrusted"] != true {
+		t.Fatalf("source issue boundary drifted: %#v", source)
+	}
+	gate := plan["authentic_bug_gate"].(map[string]any)
+	for _, key := range []string{
+		"duplicate_check_required",
+		"superseded_check_required",
+		"failing_pre_patch_reproduction_required",
+		"negative_controls_required",
+		"flaky_measurement_required_when_non_deterministic",
+	} {
+		if gate[key] != true {
+			t.Fatalf("authentic_bug_gate.%s = %#v, want true", key, gate[key])
+		}
+	}
+	if gate["security_sensitive_public_repair_allowed"] != false {
+		t.Fatalf("security sensitive public repair must stay denied: %#v", gate)
+	}
+	commands := plan["selected_commands"].([]any)
+	if len(commands) != 1 {
+		t.Fatalf("selected command count = %d, want 1", len(commands))
+	}
+	command := commands[0].(map[string]any)
+	if command["purpose"] != "pre_patch_reproduction" ||
+		command["requires_network"] != false ||
+		command["mutates_repository"] != false {
+		t.Fatalf("bad selected command boundary: %#v", command)
+	}
+	denied := plan["denied_actions"].(map[string]any)
+	for key, value := range denied {
+		if value != false {
+			t.Fatalf("denied_actions.%s = %#v, want false", key, value)
+		}
+	}
+}
+
 func TestCompatibilityVectorBlueprintAuthorizationToAtlasContext(t *testing.T) {
 	root := repoRoot(t)
 	path := filepath.Join(root, "examples", "compatibility", "blueprint-authorization-to-atlas-context-v0.1.json")
