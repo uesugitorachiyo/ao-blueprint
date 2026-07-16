@@ -1,0 +1,56 @@
+{
+  "schema_version": "ao.blueprint.github-issue-reproduction-plan.v0.1",
+  "plan_id": "github-issue-month2-reproduction-plan",
+  "source_issue": {
+    "canonical_url": "https://github.com/uesugitorachiyo/ao2/issues/123",
+    "snapshot_required": true,
+    "issue_content_is_untrusted": true
+  },
+  "repository_target": {
+    "upstream_url": "https://github.com/uesugitorachiyo/ao2.git",
+    "default_branch": "main",
+    "target_commit": "80ec5321f42d4bab17d5e64fdae6aa099ba59d4a"
+  },
+  "factual_claims": [
+    {
+      "claim_id": "claim-cli-regression",
+      "source": "immutable_issue_snapshot",
+      "maps_to": ["source", "tests", "behavior", "version"],
+      "trusted_as_authority": false
+    }
+  ],
+  "selected_commands": [
+    {
+      "command_id": "pre-patch-repro",
+      "argv": ["cargo", "test", "-p", "ao2-cli", "--test", "github_issue_intake"],
+      "purpose": "pre_patch_reproduction",
+      "policy_class": "local_test_only",
+      "requires_network": false,
+      "mutates_repository": false
+    }
+  ],
+  "authentic_bug_gate": {
+    "duplicate_check_required": true,
+    "superseded_check_required": true,
+    "failing_pre_patch_reproduction_required": true,
+    "negative_controls_required": true,
+    "flaky_measurement_required_when_non_deterministic": true,
+    "security_sensitive_public_repair_allowed": false
+  },
+  "alternatives_considered": [
+    "environment_only",
+    "configuration_error",
+    "documentation_only",
+    "expected_behavior",
+    "feature_request",
+    "already_fixed",
+    "user_error"
+  ],
+  "denied_actions": {
+    "github_write_performed": false,
+    "feature_generated_pr_opened": false,
+    "maintainer_contacted": false,
+    "provider_call_performed": false,
+    "repository_mutated": false
+  }
+}
