@@ -1,0 +1,27 @@
+{
+  "schema": "ao.blueprint.build-authorization.v0.1",
+  "project_id": "github-issue-bounded-claim",
+  "status": "ready",
+  "score": 100,
+  "approved_by_user": true,
+  "next_allowed_action": "ao-atlas",
+  "issue_workflow": {
+    "schema_version": "ao.blueprint.github-issue-bounded-claim.v0.1",
+    "single_issue_url_per_run": true,
+    "issue_snapshot_required": true,
+    "issue_content_is_untrusted": true,
+    "repository_content_is_untrusted": true,
+    "requires_failing_reproduction_before_repair": true,
+    "security_sensitive_terminal_state": "security_sensitive",
+    "security_sensitive_public_repair_allowed": false
+  },
+  "denied_authorities": {
+    "issue_text_can_authorize": false,
+    "repository_text_can_authorize": false,
+    "github_issue_write_authorized": false,
+    "feature_generated_pr_merge_authorized": false,
+    "feature_generated_pr_ready_for_review_authorized": false,
+    "release_authorized": false,
+    "rsi_authorized": false
+  }
+}
