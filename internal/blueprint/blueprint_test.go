@@ -105,6 +105,40 @@ func TestAtlasRequiredPackRoutesReadinessAndAuthorizationToAtlas(t *testing.T) {
 	}
 }
 
+func TestGitHubIssueBoundedClaimFixtureDoesNotGrantActionAuthority(t *testing.T) {
+	path := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "github-issue-bounded-claim", "build-authorization.json")
+	body, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var auth map[string]any
+	if err := json.Unmarshal(body, &auth); err != nil {
+		t.Fatal(err)
+	}
+	if auth["schema"] != "ao.blueprint.build-authorization.v0.1" ||
+		auth["project_id"] != "github-issue-bounded-claim" ||
+		auth["status"] != "ready" ||
+		auth["next_allowed_action"] != "ao-atlas" {
+		t.Fatalf("unexpected GitHub issue bounded claim authorization: %#v", auth)
+	}
+	issue := auth["issue_workflow"].(map[string]any)
+	if issue["schema_version"] != "ao.blueprint.github-issue-bounded-claim.v0.1" ||
+		issue["single_issue_url_per_run"] != true ||
+		issue["issue_snapshot_required"] != true ||
+		issue["issue_content_is_untrusted"] != true ||
+		issue["repository_content_is_untrusted"] != true ||
+		issue["requires_failing_reproduction_before_repair"] != true ||
+		issue["security_sensitive_public_repair_allowed"] != false {
+		t.Fatalf("GitHub issue workflow claim boundary drifted: %#v", issue)
+	}
+	denied := auth["denied_authorities"].(map[string]any)
+	for key, value := range denied {
+		if value != false {
+			t.Fatalf("denied_authorities.%s = %#v, want false", key, value)
+		}
+	}
+}
+
 func TestCompatibilityVectorBlueprintAuthorizationToAtlasContext(t *testing.T) {
 	root := repoRoot(t)
 	path := filepath.Join(root, "examples", "compatibility", "blueprint-authorization-to-atlas-context-v0.1.json")
