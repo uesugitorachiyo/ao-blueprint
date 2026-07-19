@@ -1,11 +1,13 @@
 package blueprint
 
 import (
+	"bufio"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -20,6 +22,10 @@ const (
 	LintSchema                           = "ao.blueprint.lint-report.v0.1"
 	InspectionSchema                     = "ao.blueprint.pack-inspection.v0.1"
 	CanonicalRegistryCompatibilitySchema = "ao.blueprint.canonical-registry-compatibility.v0.1"
+	maxBlueprintScanFiles                = 4096
+	maxBlueprintScanFileBytes            = 8 * 1024 * 1024
+	maxBlueprintScanTotalBytes           = 64 * 1024 * 1024
+	maxBlueprintScanLineBytes            = 1024 * 1024
 )
 
 type Diagnostic struct {
@@ -158,6 +164,44 @@ var secretPatterns = []struct {
 	{kind: "github_token", re: regexp.MustCompile(`gh[pousr]_[A-Za-z0-9]{20,}`)},
 	{kind: "aws_key", re: regexp.MustCompile(`AKIA[0-9A-Z]{16}`)},
 	{kind: "secret_assignment", re: regexp.MustCompile(`(?i)\b(password|passwd|token|cookie)\s*[:=]\s*[^[:space:]]+`)},
+}
+
+var errScanLimitReached = errors.New("scan limit reached")
+
+type scanBudget struct {
+	files         int
+	totalBytes    int64
+	maxFiles      int
+	maxFileBytes  int64
+	maxTotalBytes int64
+}
+
+func (b *scanBudget) accept(path string, info fs.FileInfo) (LintFinding, bool) {
+	b.files++
+	if b.files > b.maxFiles {
+		return LintFinding{
+			Path:    filepath.ToSlash(path),
+			Kind:    "file_count_limit",
+			Message: fmt.Sprintf("scan file count limit exceeded: max %d", b.maxFiles),
+		}, false
+	}
+	size := info.Size()
+	if size > b.maxFileBytes {
+		return LintFinding{
+			Path:    filepath.ToSlash(path),
+			Kind:    "file_too_large",
+			Message: fmt.Sprintf("scan file size limit exceeded: max %d bytes", b.maxFileBytes),
+		}, false
+	}
+	b.totalBytes += size
+	if b.totalBytes > b.maxTotalBytes {
+		return LintFinding{
+			Path:    filepath.ToSlash(path),
+			Kind:    "total_bytes_limit",
+			Message: fmt.Sprintf("scan total byte limit exceeded: max %d bytes", b.maxTotalBytes),
+		}, false
+	}
+	return LintFinding{}, true
 }
 
 func AuditPack(pack string) (SufficiencyAudit, error) {
@@ -452,6 +496,11 @@ func ValidateCanonicalRegistryCompatibility(readback CanonicalRegistryCompatibil
 
 func LintPath(path string) (LintReport, error) {
 	report := LintReport{Schema: LintSchema, Status: "passed"}
+	budget := scanBudget{
+		maxFiles:      maxBlueprintScanFiles,
+		maxFileBytes:  maxBlueprintScanFileBytes,
+		maxTotalBytes: maxBlueprintScanTotalBytes,
+	}
 	err := filepath.WalkDir(filepath.Clean(path), func(current string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			report.Findings = append(report.Findings, LintFinding{Path: current, Kind: "walk_error", Message: err.Error()})
@@ -463,32 +512,66 @@ func LintPath(path string) (LintReport, error) {
 			}
 			return nil
 		}
+		if entry.Type()&fs.ModeSymlink != 0 {
+			report.Findings = append(report.Findings, LintFinding{
+				Path:    filepath.ToSlash(current),
+				Kind:    "symlink",
+				Message: "symlinked public artifact input is not allowed",
+			})
+			return nil
+		}
 		if !isTextCandidate(current) {
 			return nil
 		}
-		body, readErr := os.ReadFile(current)
-		if readErr != nil {
-			report.Findings = append(report.Findings, LintFinding{Path: current, Kind: "read_error", Message: readErr.Error()})
+		info, infoErr := entry.Info()
+		if infoErr != nil {
+			report.Findings = append(report.Findings, LintFinding{Path: filepath.ToSlash(current), Kind: "stat_error", Message: infoErr.Error()})
 			return nil
 		}
-		if strings.HasSuffix(current, ".json") && !json.Valid(body) {
-			report.Findings = append(report.Findings, LintFinding{Path: filepath.ToSlash(current), Kind: "invalid_json", Message: "JSON file does not parse"})
+		if finding, ok := budget.accept(current, info); !ok {
+			report.Findings = append(report.Findings, finding)
+			return errScanLimitReached
 		}
-		for i, line := range strings.Split(string(body), "\n") {
+		if strings.HasSuffix(current, ".json") {
+			body, readErr := os.ReadFile(current)
+			if readErr != nil {
+				report.Findings = append(report.Findings, LintFinding{Path: filepath.ToSlash(current), Kind: "read_error", Message: readErr.Error()})
+				return nil
+			}
+			if !json.Valid(body) {
+				report.Findings = append(report.Findings, LintFinding{Path: filepath.ToSlash(current), Kind: "invalid_json", Message: "JSON file does not parse"})
+			}
+		}
+		file, openErr := os.Open(current)
+		if openErr != nil {
+			report.Findings = append(report.Findings, LintFinding{Path: filepath.ToSlash(current), Kind: "read_error", Message: openErr.Error()})
+			return nil
+		}
+		scanner := bufio.NewScanner(file)
+		scanner.Buffer(make([]byte, 64*1024), maxBlueprintScanLineBytes)
+		for i := 1; scanner.Scan(); i++ {
+			line := scanner.Text()
 			for _, pattern := range secretPatterns {
 				if pattern.re.MatchString(line) {
 					report.Findings = append(report.Findings, LintFinding{
 						Path:    filepath.ToSlash(current),
-						Line:    i + 1,
+						Line:    i,
 						Kind:    pattern.kind,
 						Message: "unsafe public artifact content detected",
 					})
 				}
 			}
 		}
+		if closeErr := file.Close(); closeErr != nil {
+			report.Findings = append(report.Findings, LintFinding{Path: filepath.ToSlash(current), Kind: "read_error", Message: closeErr.Error()})
+			return nil
+		}
+		if scanErr := scanner.Err(); scanErr != nil {
+			report.Findings = append(report.Findings, LintFinding{Path: filepath.ToSlash(current), Kind: "read_error", Message: scanErr.Error()})
+		}
 		return nil
 	})
-	if err != nil {
+	if err != nil && !errors.Is(err, errScanLimitReached) {
 		return report, err
 	}
 	report.FindingCount = len(report.Findings)
@@ -589,6 +672,11 @@ func digestFile(path string) (string, error) {
 
 func digestDir(root string) (string, error) {
 	hash := sha256.New()
+	budget := scanBudget{
+		maxFiles:      maxBlueprintScanFiles,
+		maxFileBytes:  maxBlueprintScanFileBytes,
+		maxTotalBytes: maxBlueprintScanTotalBytes,
+	}
 	err := filepath.WalkDir(filepath.Clean(root), func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -603,13 +691,30 @@ func digestDir(root string) (string, error) {
 		if err != nil {
 			return err
 		}
-		body, err := os.ReadFile(path)
+		rel = filepath.ToSlash(rel)
+		if entry.Type()&fs.ModeSymlink != 0 {
+			return fmt.Errorf("symlink input is not allowed: %s", rel)
+		}
+		info, err := entry.Info()
 		if err != nil {
 			return err
 		}
-		hash.Write([]byte(filepath.ToSlash(rel)))
+		if finding, ok := budget.accept(rel, info); !ok {
+			return fmt.Errorf("%s: %s", finding.Kind, finding.Message)
+		}
+		file, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		hash.Write([]byte(rel))
 		hash.Write([]byte{0})
-		hash.Write(body)
+		if _, err := io.Copy(hash, file); err != nil {
+			_ = file.Close()
+			return err
+		}
+		if err := file.Close(); err != nil {
+			return err
+		}
 		hash.Write([]byte{0})
 		return nil
 	})
