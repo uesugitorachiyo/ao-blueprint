@@ -2,6 +2,7 @@ package blueprint
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -426,6 +427,101 @@ func TestLintFindsUnsafeLocalPath(t *testing.T) {
 	}
 }
 
+func TestLintRejectsSymlinkWithoutDereferencing(t *testing.T) {
+	dir := t.TempDir()
+	outside := filepath.Join(t.TempDir(), "outside.md")
+	unsafePath := "leaks " + "/" + "Users/example/private.txt"
+	if err := os.WriteFile(outside, []byte(unsafePath), 0o600); err != nil {
+		t.Fatalf("write outside target: %v", err)
+	}
+	if err := os.Symlink(outside, filepath.Join(dir, "linked.md")); err != nil {
+		t.Fatalf("create symlink: %v", err)
+	}
+
+	report, err := LintPath(dir)
+	if err == nil {
+		t.Fatal("LintPath returned nil error for symlink")
+	}
+	if report.Status != "failed" {
+		t.Fatalf("status = %q, want failed", report.Status)
+	}
+	if !lintFindingsContainKind(report.Findings, "symlink") {
+		t.Fatalf("findings = %#v, want symlink finding", report.Findings)
+	}
+	if lintFindingsContainKind(report.Findings, "local_path") {
+		t.Fatalf("symlink target was dereferenced: %#v", report.Findings)
+	}
+}
+
+func TestLintRejectsOversizedTextCandidate(t *testing.T) {
+	dir := t.TempDir()
+	body := strings.Repeat("a", maxBlueprintScanFileBytes+1)
+	if err := os.WriteFile(filepath.Join(dir, "oversized.md"), []byte(body), 0o600); err != nil {
+		t.Fatalf("write oversized fixture: %v", err)
+	}
+
+	report, err := LintPath(dir)
+	if err == nil {
+		t.Fatal("LintPath returned nil error for oversized file")
+	}
+	if !lintFindingsContainKind(report.Findings, "file_too_large") {
+		t.Fatalf("findings = %#v, want file_too_large", report.Findings)
+	}
+}
+
+func TestLintRejectsTooManyTextCandidates(t *testing.T) {
+	dir := t.TempDir()
+	for i := 0; i <= maxBlueprintScanFiles; i++ {
+		if err := os.WriteFile(filepath.Join(dir, fmt.Sprintf("file-%05d.md", i)), []byte("safe\n"), 0o600); err != nil {
+			t.Fatalf("write fixture %d: %v", i, err)
+		}
+	}
+
+	report, err := LintPath(dir)
+	if err == nil {
+		t.Fatal("LintPath returned nil error for too many files")
+	}
+	if !lintFindingsContainKind(report.Findings, "file_count_limit") {
+		t.Fatalf("findings = %#v, want file_count_limit", report.Findings)
+	}
+}
+
+func TestDigestDirRejectsSymlinkInput(t *testing.T) {
+	dir := t.TempDir()
+	outside := filepath.Join(t.TempDir(), "outside.md")
+	if err := os.WriteFile(outside, []byte("external content\n"), 0o600); err != nil {
+		t.Fatalf("write outside target: %v", err)
+	}
+	if err := os.Symlink(outside, filepath.Join(dir, "linked.md")); err != nil {
+		t.Fatalf("create symlink: %v", err)
+	}
+
+	digest, err := digestDir(dir)
+	if err == nil {
+		t.Fatalf("digestDir returned nil error for symlink; digest=%s", digest)
+	}
+	if !strings.Contains(err.Error(), "symlink") {
+		t.Fatalf("error = %q, want symlink", err.Error())
+	}
+}
+
+func TestDigestDirRejectsTooManyFiles(t *testing.T) {
+	dir := t.TempDir()
+	for i := 0; i <= maxBlueprintScanFiles; i++ {
+		if err := os.WriteFile(filepath.Join(dir, fmt.Sprintf("file-%05d.md", i)), []byte("safe\n"), 0o600); err != nil {
+			t.Fatalf("write fixture %d: %v", i, err)
+		}
+	}
+
+	digest, err := digestDir(dir)
+	if err == nil {
+		t.Fatalf("digestDir returned nil error for too many files; digest=%s", digest)
+	}
+	if !strings.Contains(err.Error(), "file count limit") {
+		t.Fatalf("error = %q, want file count limit", err.Error())
+	}
+}
+
 func TestInspectPackReportsRequiredArtifacts(t *testing.T) {
 	pack := filepath.Join(repoRoot(t), "examples", "blueprints", "valid", "ao-blueprint-self")
 
@@ -444,6 +540,15 @@ func TestInspectPackReportsRequiredArtifacts(t *testing.T) {
 func diagnosticsContainPath(items []Diagnostic, want string) bool {
 	for _, item := range items {
 		if strings.Contains(item.Path, want) {
+			return true
+		}
+	}
+	return false
+}
+
+func lintFindingsContainKind(items []LintFinding, want string) bool {
+	for _, item := range items {
+		if item.Kind == want {
 			return true
 		}
 	}
