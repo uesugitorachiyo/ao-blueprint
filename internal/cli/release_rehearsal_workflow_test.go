@@ -82,10 +82,15 @@ func TestReleaseRehearsalWorkflowContract(t *testing.T) {
 	for _, want := range []string{
 		"WORKFLOW_SHA: ${{ github.sha }}",
 		shaBinding,
+		"cd rehearsal-inputs",
+		"sha256sum release-inputs.json > release-inputs.sha256",
 	} {
 		if !strings.Contains(bindJob, want) {
 			t.Fatalf("input binding job missing %q", want)
 		}
+	}
+	if strings.Contains(bindJob, "sha256sum rehearsal-inputs/release-inputs.json") {
+		t.Fatal("input checksum must use an artifact-root-relative filename")
 	}
 	if strings.Index(bindJob, shaBinding) > strings.Index(bindJob, "actions/checkout") {
 		t.Fatal("source commit must be bound to github.sha before checkout")

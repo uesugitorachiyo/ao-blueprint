@@ -71,7 +71,10 @@ jobs:
           printf '%s\n' \
             "{\"approved_manifest_digest\":\"$APPROVED_MANIFEST_DIGEST\",\"dry_run\":true,\"repository\":\"ao-blueprint\",\"source_commit\":\"$SOURCE_COMMIT\",\"tag\":\"$TAG\",\"version\":\"$VERSION\"}" \
             > rehearsal-inputs/release-inputs.json
-          sha256sum rehearsal-inputs/release-inputs.json > rehearsal-inputs/release-inputs.sha256
+          (
+            cd rehearsal-inputs
+            sha256sum release-inputs.json > release-inputs.sha256
+          )
 
       - name: Upload bound rehearsal inputs
         uses: actions/upload-artifact@v4
