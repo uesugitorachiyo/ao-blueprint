@@ -1,0 +1,244 @@
+name: specialist-release-rehearsal
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact candidate version and future release tag.
+        required: true
+        type: string
+      tag:
+        description: Exact future tag; must match version.
+        required: true
+        type: string
+      source_commit:
+        description: Exact 40-character source commit for every candidate.
+        required: true
+        type: string
+      approved_manifest_digest:
+        description: Approved asset manifest digest in sha256:<hex> form.
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  bind-release-inputs:
+    name: bind-release-inputs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate exact rehearsal bindings
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          WORKFLOW_SHA: ${{ github.sha }}
+          APPROVED_MANIFEST_DIGEST: ${{ inputs.approved_manifest_digest }}
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^v?[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]
+          [[ "$TAG" == "$VERSION" ]]
+          [[ "$SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          test "$SOURCE_COMMIT" = "$WORKFLOW_SHA"
+          [[ "$APPROVED_MANIFEST_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]
+
+      - name: Check out exact source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 1
+
+      - name: Verify checked out source
+        shell: bash
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+
+      - name: Record immutable rehearsal inputs
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          APPROVED_MANIFEST_DIGEST: ${{ inputs.approved_manifest_digest }}
+        run: |
+          set -euo pipefail
+          mkdir -p rehearsal-inputs
+          printf '%s\n' \
+            "{\"approved_manifest_digest\":\"$APPROVED_MANIFEST_DIGEST\",\"dry_run\":true,\"repository\":\"ao-blueprint\",\"source_commit\":\"$SOURCE_COMMIT\",\"tag\":\"$TAG\",\"version\":\"$VERSION\"}" \
+            > rehearsal-inputs/release-inputs.json
+          sha256sum rehearsal-inputs/release-inputs.json > rehearsal-inputs/release-inputs.sha256
+
+      - name: Upload bound rehearsal inputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ao-blueprint-release-rehearsal-inputs-${{ inputs.source_commit }}
+          path: rehearsal-inputs
+          if-no-files-found: error
+          overwrite: false
+
+  build-native-candidates:
+    name: build-native-candidate (${{ matrix.target_label }})
+    needs: bind-release-inputs
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target_label: linux-x86_64
+            binary_suffix: ""
+            expected_goos: linux
+            expected_goarch: amd64
+          - os: macos-15
+            target_label: macos-aarch64
+            binary_suffix: ""
+            expected_goos: darwin
+            expected_goarch: arm64
+          - os: windows-latest
+            target_label: windows-x86_64
+            binary_suffix: ".exe"
+            expected_goos: windows
+            expected_goarch: amd64
+    steps:
+      - name: Check out exact source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 1
+
+      - name: Verify checked out source
+        shell: bash
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build and smoke native candidate
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          APPROVED_MANIFEST_DIGEST: ${{ inputs.approved_manifest_digest }}
+          TARGET_LABEL: ${{ matrix.target_label }}
+          BINARY_SUFFIX: ${{ matrix.binary_suffix }}
+          EXPECTED_GOOS: ${{ matrix.expected_goos }}
+          EXPECTED_GOARCH: ${{ matrix.expected_goarch }}
+        run: |
+          set -euo pipefail
+          artifact_dir="candidate/${TARGET_LABEL}"
+          binary="ao-blueprint${BINARY_SUFFIX}"
+          mkdir -p "$artifact_dir"
+          actual_goos=$(go env GOOS)
+          actual_goarch=$(go env GOARCH)
+          test "$actual_goos" = "$EXPECTED_GOOS"
+          test "$actual_goarch" = "$EXPECTED_GOARCH"
+          go build -trimpath \
+            -ldflags "-X github.com/uesugitorachiyo/ao-blueprint/internal/cli.version=${VERSION}" \
+            -o "$artifact_dir/$binary" \
+            ./cmd/blueprint
+          "$artifact_dir/$binary" --help > "$artifact_dir/help-smoke.txt" 2>&1
+
+          module_path=$(go list -m -f '{{.Path}}')
+          go_language_version=$(go list -m -f '{{.GoVersion}}')
+          go_mod_version=$(awk '$1 == "go" { print $2; exit }' go.mod)
+          test "$module_path" = "github.com/uesugitorachiyo/ao-blueprint"
+          test "$go_language_version" = "$go_mod_version"
+          version_readback=$("$artifact_dir/$binary" --version)
+          test "$version_readback" = "$VERSION"
+          printf '{"binary":"%s","command":"--version","go_language_version":"%s","module_path":"%s","release_version_readback":"%s","source_commit":"%s","status":"passed"}\n' \
+            "$binary" "$go_language_version" "$module_path" "$version_readback" "$SOURCE_COMMIT" \
+            > "$artifact_dir/version-smoke.json"
+
+          "$artifact_dir/$binary" pack inspect \
+            --pack examples/blueprints/valid/ao-blueprint-self \
+            --json > "$artifact_dir/provider-free-smoke.json"
+          grep -q '"schema": "ao.blueprint.pack-inspection.v0.1"' "$artifact_dir/provider-free-smoke.json"
+          grep -q '"status": "ready"' "$artifact_dir/provider-free-smoke.json"
+          grep -q '"project_id": "ao-blueprint-self"' "$artifact_dir/provider-free-smoke.json"
+
+          cp LICENSE "$artifact_dir/LICENSE"
+          cp NOTICE "$artifact_dir/NOTICE"
+          (
+            cd "$artifact_dir"
+            if command -v sha256sum >/dev/null 2>&1; then
+              sha256sum "$binary" > SHA256SUMS
+            else
+              shasum -a 256 "$binary" > SHA256SUMS
+            fi
+          )
+          binary_sha256=$(awk '{print $1}' "$artifact_dir/SHA256SUMS")
+          printf '{"approved_manifest_digest":"%s","binary":"%s","binary_sha256":"%s","dry_run":true,"goarch":"%s","goos":"%s","license_files":["LICENSE","NOTICE"],"publication":{"public_release_attempted":false,"public_upload_attempted":false,"release_creation_attempted":false,"tag_creation_attempted":false},"repository":"ao-blueprint","schema_version":"ao.blueprint.release-rehearsal-candidate.v0.1","smoke":{"help":{"command":"--help","status":"passed"},"provider_free":{"command":"pack inspect --pack examples/blueprints/valid/ao-blueprint-self --json","status":"passed"},"version":{"binary":"%s","command":"--version","release_version_readback":"%s","source_commit":"%s","status":"passed"}},"source_commit":"%s","tag":"%s","target":"%s","version":"%s"}\n' \
+            "$APPROVED_MANIFEST_DIGEST" "$binary" "$binary_sha256" \
+            "$actual_goarch" "$actual_goos" "$binary" "$version_readback" "$SOURCE_COMMIT" \
+            "$SOURCE_COMMIT" "$TAG" "$TARGET_LABEL" "$VERSION" \
+            > "$artifact_dir/candidate.json"
+
+      - name: Upload native candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: ao-blueprint-release-candidate-${{ matrix.target_label }}-${{ inputs.source_commit }}
+          path: candidate/${{ matrix.target_label }}
+          if-no-files-found: error
+          overwrite: false
+
+  assemble-promotion-plan:
+    name: assemble-promotion-plan
+    needs: build-native-candidates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out exact verifier
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_commit }}
+          fetch-depth: 1
+
+      - name: Verify checked out source
+        shell: bash
+        env:
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_COMMIT"
+
+      - name: Download native candidates
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ao-blueprint-release-candidate-*-${{ inputs.source_commit }}
+          path: candidates
+
+      - name: Assemble exact inventory promotion plan
+        shell: bash
+        env:
+          VERSION: ${{ inputs.version }}
+          TAG: ${{ inputs.tag }}
+          SOURCE_COMMIT: ${{ inputs.source_commit }}
+          APPROVED_MANIFEST_DIGEST: ${{ inputs.approved_manifest_digest }}
+        run: |
+          set -euo pipefail
+          python3 .github/scripts/verify-release-candidates.py \
+            --candidates candidates \
+            --plan promotion-plan.json \
+            --checksum promotion-plan.sha256
+
+      - name: Upload immutable promotion plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: ao-blueprint-specialist-promotion-plan-${{ inputs.source_commit }}
+          path: |
+            promotion-plan.json
+            promotion-plan.sha256
+          if-no-files-found: error
+          overwrite: false

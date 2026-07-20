@@ -40,9 +40,15 @@ var questions = []question{
 	{ID: "q-security", Category: "security", Prompt: "What secrets, private data, destructive actions, or public-safety constraints apply?"},
 }
 
+var version = "dev"
+
 func Run(args []string, stdout io.Writer, stderr io.Writer) error {
 	if len(args) == 0 || args[0] == "--help" || args[0] == "-h" {
 		printHelp(stdout)
+		return nil
+	}
+	if args[0] == "--version" {
+		fmt.Fprintln(stdout, version)
 		return nil
 	}
 
@@ -75,6 +81,7 @@ func printHelp(stdout io.Writer) {
 	fmt.Fprintln(stdout, `AO Blueprint
 
 Usage:
+  blueprint --version
   blueprint interview start --idea <text> --out <json>
   blueprint interview next --session <json>
   blueprint interview answer --session <json> --question-id <id> --answer <text> --out <json>
