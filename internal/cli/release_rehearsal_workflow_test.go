@@ -429,9 +429,14 @@ func writeReleaseCandidateFixture(t *testing.T) string {
 		}
 		binaryBody := []byte("candidate-" + target)
 		digest := fmt.Sprintf("%x", sha256.Sum256(binaryBody))
+		checksumSeparator := "  "
+		if target == "windows-x86_64" {
+			// GNU sha256sum uses the binary-mode marker on Windows.
+			checksumSeparator = " *"
+		}
 		files := map[string][]byte{
 			binary:                     binaryBody,
-			"SHA256SUMS":               []byte(digest + "  " + binary + "\n"),
+			"SHA256SUMS":               []byte(digest + checksumSeparator + binary + "\n"),
 			"LICENSE":                  []byte("license\n"),
 			"NOTICE":                   []byte("notice\n"),
 			"help-smoke.txt":           []byte("AO Blueprint\n"),

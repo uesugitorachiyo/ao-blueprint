@@ -77,7 +77,8 @@ def verify_candidate(candidate_path, expected):
         fail(f"missing candidate inventory: {candidate_path}")
 
     checksum_fields = sums_path.read_text(encoding="utf-8").strip().split()
-    if len(checksum_fields) != 2 or checksum_fields[1] != binary or Path(checksum_fields[1]).name != checksum_fields[1]:
+    checksum_name = checksum_fields[1].removeprefix("*") if len(checksum_fields) == 2 else ""
+    if checksum_name != binary or Path(checksum_name).name != checksum_name:
         fail(f"non-portable SHA256SUMS entry: {candidate_path}")
     actual_sha256 = hashlib.sha256(binary_path.read_bytes()).hexdigest()
     if candidate.get("binary_sha256") != actual_sha256 or checksum_fields[0] != actual_sha256:
