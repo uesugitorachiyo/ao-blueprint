@@ -3,3 +3,5 @@ tmp/
 target/
 *.test
 coverage.out
+CLAUDE.local.md
+.claude/settings.local.json
