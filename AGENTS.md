@@ -12,6 +12,7 @@ Blueprint authorization means only that the declared requirements are sufficient
 - [docs/sdd/AO-BLUEPRINT-INTERVIEW.md](docs/sdd/AO-BLUEPRINT-INTERVIEW.md) and [docs/sdd/AO-BLUEPRINT-READINESS.md](docs/sdd/AO-BLUEPRINT-READINESS.md) own interview and authorization stop conditions.
 - `docs/contracts/` owns JSON schemas; `internal/blueprint/`, `internal/cli/`, and their tests are authoritative for implemented behavior.
 - [docs/design/PRODUCTION-READINESS.md](docs/design/PRODUCTION-READINESS.md), `scripts/production-readiness.sh`, and [`.github/workflows/ci.yml`](.github/workflows/ci.yml) define the broad verification gate.
+- [ao-quality-gates.json](ao-quality-gates.json) declares the source-owned commit, push, and full quality commands consumed by the stack-wide quality runner.
 
 ## Ownership And Boundaries
 
