@@ -2,11 +2,13 @@ package blueprint
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"testing"
 )
 
@@ -434,9 +436,7 @@ func TestLintRejectsSymlinkWithoutDereferencing(t *testing.T) {
 	if err := os.WriteFile(outside, []byte(unsafePath), 0o600); err != nil {
 		t.Fatalf("write outside target: %v", err)
 	}
-	if err := os.Symlink(outside, filepath.Join(dir, "linked.md")); err != nil {
-		t.Fatalf("create symlink: %v", err)
-	}
+	requireSymlink(t, outside, filepath.Join(dir, "linked.md"))
 
 	report, err := LintPath(dir)
 	if err == nil {
@@ -492,9 +492,7 @@ func TestDigestDirRejectsSymlinkInput(t *testing.T) {
 	if err := os.WriteFile(outside, []byte("external content\n"), 0o600); err != nil {
 		t.Fatalf("write outside target: %v", err)
 	}
-	if err := os.Symlink(outside, filepath.Join(dir, "linked.md")); err != nil {
-		t.Fatalf("create symlink: %v", err)
-	}
+	requireSymlink(t, outside, filepath.Join(dir, "linked.md"))
 
 	digest, err := digestDir(dir)
 	if err == nil {
@@ -553,6 +551,16 @@ func lintFindingsContainKind(items []LintFinding, want string) bool {
 		}
 	}
 	return false
+}
+
+func requireSymlink(t *testing.T, oldname, newname string) {
+	t.Helper()
+	if err := os.Symlink(oldname, newname); err != nil {
+		if runtime.GOOS == "windows" && errors.Is(err, syscall.Errno(1314)) {
+			t.Skip("symlink creation requires an unavailable Windows privilege")
+		}
+		t.Fatalf("create symlink: %v", err)
+	}
 }
 
 func copyDirForTest(source string, target string) error {
