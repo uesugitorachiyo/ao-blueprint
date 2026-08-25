@@ -16,6 +16,10 @@ and the
 [AO Blueprint component page](https://github.com/uesugitorachiyo/ao-architecture/blob/main/components/ao-blueprint.md)
 for the cross-repository flow.
 
+## Build and run from source
+
+Requires Go 1.22 or later.
+
 ## Commands
 
 ```bash
